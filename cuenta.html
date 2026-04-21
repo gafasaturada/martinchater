@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta - Martin Chater</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111111;
+            --surface2: #1a1a1a;
+            --border: #222222;
+            --red: #cc2200;
+            --red-dim: rgba(204,34,0,0.15);
+            --red-glow: rgba(204,34,0,0.25);
+            --text: #e8e8e8;
+            --text-dim: #666666;
+            --sidebar-w: 72px;
+            --topbar-h: 64px;
+            --green: #22c55e;
+            --green-dim: rgba(34,197,94,0.15);
+            --gold: #e8c84a;
+            --gold-dim: rgba(232,200,74,0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Grain overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.4;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            top: 0; right: -1px;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, var(--red), transparent);
+            opacity: 0.6;
+        }
+
+        .sidebar-logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-logo:hover {
+            transform: scale(1.05);
+        }
+
+        /* TOPBAR */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: var(--topbar-h);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+        }
+
+        .topbar::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--red), transparent 60%);
+            opacity: 0.5;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            color: var(--text);
+            opacity: 0.5;
+        }
+
+        .topbar-sep {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+        }
+
+        .breadcrumb {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .breadcrumb a {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text);
+        }
+
+        .breadcrumb span { color: var(--red); }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .coins-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coins-display::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, var(--gold-dim), transparent);
+        }
+
+        .coins-display i { font-size: 0.8rem; }
+
+        .topbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .topbar-btn:hover {
+            background: var(--surface2);
+            color: var(--text);
+            border-color: #333;
+        }
+
+        .topbar-btn.danger:hover {
+            background: var(--red-dim);
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--topbar-h);
+            min-height: calc(100vh - var(--topbar-h));
+            padding: 40px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Background grid lines */
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: var(--topbar-h);
+            left: var(--sidebar-w);
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.3;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* PROFILE CARD */
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--red), transparent);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            object-fit: cover;
+            position: relative;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+        }
+
+        .profile-avatar-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 14px;
+            background: conic-gradient(from 0deg, var(--red), transparent 30%, var(--red) 60%, transparent);
+            animation: rotateBorder 4s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotateBorder {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .profile-joined {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-joined i {
+            color: var(--red);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+
+        .stat-value.green { color: var(--green); }
+        .stat-value.red { color: var(--red); }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* HISTORY CARD */
+        .history-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title i {
+            color: var(--red);
+        }
+
+        .history-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item:hover {
+            background: var(--surface2);
+        }
+
+        .history-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .history-icon.win {
+            background: var(--green-dim);
+            color: var(--green);
+        }
+
+        .history-icon.loss {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
+        .history-icon.bonus {
+            background: var(--gold-dim);
+            color: var(--gold);
+        }
+
+        .history-details h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .history-details p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .history-amount {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+        }
+
+        .history-amount.positive {
+            color: var(--green);
+        }
+
+        .history-amount.negative {
+            color: var(--red);
+        }
+
+        .empty-history {
+            padding: 60px 24px;
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        .empty-history i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-history p {
+            font-size: 0.9rem;
+        }
+
+        /* BONUS CARD */
+        .bonus-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bonus-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, var(--gold-dim) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .bonus-card:hover::before {
+            opacity: 1;
+        }
+
+        .bonus-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gold-dim);
+            border: 2px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: var(--gold);
+            position: relative;
+        }
+
+        .bonus-icon::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 1px dashed var(--gold);
+            opacity: 0.4;
+            animation: spinSlow 10s linear infinite;
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .bonus-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: 4px;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .bonus-amount {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px var(--gold-dim);
+        }
+
+        .bonus-description {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+
+        .bonus-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, var(--gold) 0%, #c9a227 100%);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bonus-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .bonus-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .bonus-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(232,200,74,0.3);
+        }
+
+        .bonus-btn:disabled {
+            background: var(--surface2);
+            color: var(--text-dim);
+            cursor: not-allowed;
+        }
+
+        .bonus-btn i {
+            font-size: 1rem;
+        }
+
+        /* COUNTDOWN */
+        .countdown-container {
+            margin-top: 20px;
+            padding: 16px 24px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            display: none;
+        }
+
+        .countdown-container.active {
+            display: block;
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .countdown-timer {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 4px;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .countdown-timer i {
+            font-size: 1.2rem;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* CLAIM ANIMATION */
+        .claim-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--surface);
+            border: 2px solid var(--gold);
+            border-radius: 16px;
+            padding: 48px 64px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 100px var(--gold-dim);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .claim-animation.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .claim-animation h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 4px;
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+
+        .claim-animation .amount {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            color: var(--gold);
+            text-shadow: 0 0 30px var(--gold-dim);
+            animation: claimPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes claimPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .claim-animation button {
+            margin-top: 24px;
+            padding: 12px 32px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .claim-animation button:hover {
+            background: #fff;
+        }
+
+        /* OVERLAY */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* CONFETTI */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1001;
+            display: none;
+        }
+
+        .confetti-container.active {
+            display: block;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            :root { --sidebar-w: 56px; }
+            
+            .main-content {
+                padding: 24px 16px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-name {
+                font-size: 2rem;
+            }
+
+            .topbar {
+                padding: 0 16px;
+            }
+
+            .topbar-title, .topbar-sep, .breadcrumb {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="inicio.html">
+            <img src="logo2.png" alt="Logo" class="sidebar-logo">
+        </a>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="topbar-title">MARTIN CHATER</span>
+            <div class="topbar-sep"></div>
+            <span class="breadcrumb">
+                <a href="inicio.html">Inicio</a> / <span>Mi Cuenta</span>
+            </span>
+        </div>
+        <div class="topbar-right">
+            <div class="coins-display">
+                <i class="fas fa-coins"></i>
+                <span id="coinsAmount">0</span>
+            </div>
+            <a href="inicio.html" class="topbar-btn">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <button class="topbar-btn danger" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="content-wrapper">
+
+            <!-- PROFILE CARD -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar-wrapper">
+                        <img src="logo.png" alt="Avatar" class="profile-avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h1 class="profile-name" id="profileName">USUARIO</h1>
+                        <p class="profile-joined">
+                            <i class="fas fa-calendar-alt"></i>
+                            Miembro desde <span id="joinedDate">--</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCoins">0</div>
+                        <div class="stat-label">Monedas Totales</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value green" id="totalWins">0</div>
+                        <div class="stat-label">Ganancias</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value red" id="totalLosses">0</div>
+                        <div class="stat-label">Partidas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORY CARD -->
+            <div class="history-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i>
+                        Historial de Ganancias
+                    </h2>
+                </div>
+                <div class="history-list" id="historyList">
+                    <!-- History items will be inserted here -->
+                </div>
+            </div>
+
+            <!-- BONUS CARD -->
+            <div class="bonus-card">
+                <div class="bonus-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h2 class="bonus-title">BONO DIARIO</h2>
+                <div class="bonus-amount">+5,000</div>
+                <p class="bonus-description">Reclama tu bono diario y recibe monedas gratis</p>
+                <button class="bonus-btn" id="claimBtn" onclick="claimBonus()">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    RECLAMAR BONO DIARIO
+                </button>
+                <div class="countdown-container" id="countdownContainer">
+                    <div class="countdown-label">Siguiente bono disponible en</div>
+                    <div class="countdown-timer">
+                        <i class="fas fa-clock"></i>
+                        <span id="countdown">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- CLAIM ANIMATION -->
+    <div class="claim-animation" id="claimAnimation">
+        <h2>BONO RECLAMADO</h2>
+        <div class="amount">+5,000</div>
+        <button onclick="closeClaimAnimation()">CONTINUAR</button>
+    </div>
+
+    <!-- CONFETTI -->
+    <div class="confetti-container" id="confetti"></div>
+
+    <script>
+        const STORAGE_KEY = 'martinChaterUser';
+        const BONUS_KEY = 'martinChaterLastBonus';
+        const HISTORY_KEY = 'martinChaterHistory';
+        const BONUS_AMOUNT = 5000;
+        const BONUS_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+        let userData = null;
+        let countdownInterval = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
+            loadHistory();
+            checkBonusStatus();
+        });
+
+        // Load user data
+        function loadUserData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) {
+                window.location.href = 'login.html';
+                return;
+            }
+            userData = JSON.parse(saved);
+            updateUI();
+        }
+
+        // Update UI with user data
+        function updateUI() {
+            document.getElementById('profileName').textContent = userData.name.toUpperCase();
+            document.getElementById('coinsAmount').textContent = formatNumber(userData.coins || 0);
+            document.getElementById('totalCoins').textContent = formatNumber(userData.coins || 0);
+            
+            // Format joined date
+            if (userData.joined) {
+                const date = new Date(userData.joined);
+                document.getElementById('joinedDate').textContent = date.toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+
+            // Load stats from history
+            updateStats();
+        }
+
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toLocaleString('es-ES');
+        }
+
+        // Load history
+        function loadHistory() {
+            const history = getHistory();
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-history">
+                        <i class="fas fa-inbox"></i>
+                        <p>No hay historial de ganancias</p>
+                    </div>
+                `;
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => {
+                let iconClass = 'win';
+                let icon = 'fa-trophy';
+                let amountClass = 'positive';
+                let amountPrefix = '+';
+
+                if (item.type === 'loss') {
+                    iconClass = 'loss';
+                    icon = 'fa-times-circle';
+                    amountClass = 'negative';
+                    amountPrefix = '-';
+                } else if (item.type === 'bonus') {
+                    iconClass = 'bonus';
+                    icon = 'fa-gift';
+                }
+
+                const date = new Date(item.date);
+                const dateStr = date.toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div class="history-item">
+                        <div class="history-left">
+                            <div class="history-icon ${iconClass}">
+                                <i class="fas ${icon}"></i>
+                            </div>
+                            <div class="history-details">
+                                <h4>${item.description}</h4>
+                                <p>${dateStr}</p>
+                            </div>
+                        </div>
+                        <div class="history-amount ${amountClass}">
+                            ${amountPrefix}${formatNumber(item.amount)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Get history from localStorage
+        function getHistory() {
+            const saved = localStorage.getItem(HISTORY_KEY);
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        // Add to history
+        function addToHistory(type, description, amount) {
+            const history = getHistory();
+            history.unshift({
+                type,
+                description,
+                amount,
+                date: new Date().toISOString()
+            });
+            // Keep only last 50 entries
+            if (history.length > 50) history.pop();
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            loadHistory();
+            updateStats();
+        }
+
+        // Update stats
+        function updateStats() {
+            const history = getHistory();
+            const wins = history.filter(h => h.type === 'win' || h.type === 'bonus');
+            const totalWins = wins.reduce((sum, h) => sum + h.amount, 0);
+            const totalGames = history.filter(h => h.type !== 'bonus').length;
+
+            document.getElementById('totalWins').textContent = formatNumber(totalWins);
+            document.getElementById('totalLosses').textContent = totalGames;
+        }
+
+        // Check bonus status
+        function checkBonusStatus() {
+            const lastBonus = localStorage.getItem(BONUS_KEY);
+            const claimBtn = document.getElementById('claimBtn');
+            const countdownContainer = document.getElementById('countdownContainer');
+
+            if (!lastBonus) {
+                // Never claimed, can claim
+                claimBtn.disabled = false;
+                countdownContainer.classList.remove('active');
+                return;
+            }
+
+            const lastBonusTime = parseInt(lastBonus);
+            const now = Date.now();
+            const timePassed = now - lastBonusTime;
+
+            if (timePassed >= BONUS_COOLDOWN) {
+                // Cooldown passed, can claim
+                claimBtn.disabled = false;
+                countdownContainer.classList.remove('active');
+            } else {
+                // Still on cooldown
+                claimBtn.disabled = true;
+                countdownContainer.classList.add('active');
+                startCountdown(lastBonusTime + BONUS_COOLDOWN);
+            }
+        }
+
+        // Start countdown
+        function startCountdown(endTime) {
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            function updateCountdown() {
+                const now = Date.now();
+                const remaining = endTime - now;
+
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    checkBonusStatus();
+                    return;
+                }
+
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+                document.getElementById('countdown').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        // Claim bonus
+        function claimBonus() {
+            const claimBtn = document.getElementById('claimBtn');
+            if (claimBtn.disabled) return;
+
+            // Update coins
+            userData.coins = (userData.coins || 0) + BONUS_AMOUNT;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+
+            // Save bonus time
+            localStorage.setItem(BONUS_KEY, Date.now().toString());
+
+            // Add to history
+            addToHistory('bonus', 'Bono Diario', BONUS_AMOUNT);
+
+            // Update UI
+            updateUI();
+
+            // Show animation
+            showClaimAnimation();
+
+            // Update bonus status
+            checkBonusStatus();
+        }
+
+        // Show claim animation
+        function showClaimAnimation() {
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('claimAnimation').classList.add('show');
+            showConfetti();
+        }
+
+        // Close claim animation
+        function closeClaimAnimation() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('claimAnimation').classList.remove('show');
+        }
+
+        // Show confetti
+        function showConfetti() {
+            const container = document.getElementById('confetti');
+            container.classList.add('active');
+            container.innerHTML = '';
+
+            const colors = ['#e8c84a', '#cc2200', '#22c55e', '#fff', '#ff6b35'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                container.appendChild(confetti);
+            }
+
+            setTimeout(() => {
+                container.classList.remove('active');
+            }, 3000);
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem(STORAGE_KEY);
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
