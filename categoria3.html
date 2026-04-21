@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Global - Martin Chater</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gold-primary: #e8c84a;
+            --gold-light: #f5e6a3;
+            --gold-dark: #c9a227;
+            --white: #ffffff;
+            --off-white: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #e5e5e5;
+            --gray-400: #a3a3a3;
+            --gray-600: #525252;
+            --gray-800: #262626;
+            --gray-900: #171717;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--off-white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Particles */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--gold-primary);
+            opacity: 0.3;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border-bottom: 3px solid var(--gold-primary);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gray-900);
+            color: var(--gold-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .header-title h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .header-title span {
+            font-size: 12px;
+            color: var(--gold-dark);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gray-100);
+            padding: 10px 20px;
+            border: 2px solid var(--gray-200);
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .user-badge::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .exit-btn {
+            background: var(--white);
+            border: 2px solid var(--gray-900);
+            padding: 12px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: var(--gray-900);
+        }
+
+        .exit-btn:hover {
+            background: var(--gray-900);
+            color: var(--white);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--gray-900);
+            color: var(--white);
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .status-dot.searching {
+            background: var(--gold-primary);
+            animation: pulse 1s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: var(--danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Video Container */
+        .video-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-height: calc(100vh - 280px);
+        }
+
+        .video-box {
+            background: var(--gray-900);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px solid var(--gray-800);
+            transition: border-color 0.3s ease;
+        }
+
+        .video-box.active {
+            border-color: var(--gold-primary);
+        }
+
+        .video-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-box .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            color: var(--gray-400);
+        }
+
+        .video-box .placeholder i {
+            font-size: 48px;
+            color: var(--gold-primary);
+            opacity: 0.5;
+        }
+
+        .video-box .placeholder span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .video-label {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.7);
+            color: var(--white);
+            padding: 8px 15px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .video-label i {
+            color: var(--gold-primary);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--white);
+            border: 3px solid var(--gold-primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .control-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 30px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border: 2px solid var(--gray-900);
+            background: var(--white);
+            color: var(--gray-900);
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+        }
+
+        .control-btn:hover {
+            background: var(--gray-900);
+            color: var(--white);
+        }
+
+        .control-btn.primary {
+            background: var(--gold-primary);
+            border-color: var(--gold-dark);
+            color: var(--gray-900);
+        }
+
+        .control-btn.primary:hover {
+            background: var(--gold-dark);
+        }
+
+        .control-btn.danger {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: var(--white);
+        }
+
+        .control-btn.danger:hover {
+            background: #dc2626;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .control-btn i {
+            font-size: 18px;
+        }
+
+        /* Searching Overlay */
+        .searching-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(23, 23, 23, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .searching-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .searching-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid var(--gray-800);
+            border-top-color: var(--gold-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .searching-text {
+            color: var(--white);
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .searching-subtext {
+            color: var(--gray-400);
+            font-size: 14px;
+        }
+
+        .cancel-search-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid var(--gold-primary);
+            color: var(--gold-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-search-btn:hover {
+            background: var(--gold-primary);
+            color: var(--gray-900);
+        }
+
+        /* Permission Modal */
+        .permission-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .permission-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .permission-content {
+            background: var(--white);
+            padding: 40px;
+            max-width: 450px;
+            text-align: center;
+            border: 3px solid var(--gold-primary);
+        }
+
+        .permission-content i {
+            font-size: 60px;
+            color: var(--gold-primary);
+            margin-bottom: 20px;
+        }
+
+        .permission-content h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--gray-900);
+        }
+
+        .permission-content p {
+            color: var(--gray-600);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .permission-btn {
+            background: var(--gold-primary);
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .permission-btn:hover {
+            background: var(--gold-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .header-title h1 {
+                font-size: 18px;
+            }
+
+            .video-container {
+                grid-template-columns: 1fr;
+                max-height: none;
+            }
+
+            .video-box {
+                min-height: 200px;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+                padding: 12px;
+            }
+
+            .control-btn {
+                padding: 12px 20px;
+                font-size: 12px;
+            }
+
+            .control-btn span {
+                display: none;
+            }
+
+            .user-badge {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-icon">MC</div>
+            <div class="header-title">
+                <h1>Camera Global</h1>
+                <span>MARTIN CHATER</span>
+            </div>
+        </div>
+        <div class="user-badge">
+            <span id="userDisplay">Visitante</span>
+        </div>
+        <a href="categorias.html" class="exit-btn">SALIR</a>
+    </header>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-indicator">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Esperando...</span>
+        </div>
+        <div id="onlineCount">0 usuarios online</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Video Container -->
+        <div class="video-container">
+            <!-- Local Video -->
+            <div class="video-box" id="localVideoBox">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div class="placeholder" id="localPlaceholder">
+                    <i class="fas fa-video-slash"></i>
+                    <span>Tu camara</span>
+                </div>
+                <div class="video-label">
+                    <i class="fas fa-user"></i>
+                    <span id="localLabel">Tu</span>
+                </div>
+            </div>
+
+            <!-- Remote Video -->
+            <div class="video-box" id="remoteVideoBox">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="placeholder" id="remotePlaceholder">
+                    <i class="fas fa-user-slash"></i>
+                    <span>Esperando conexion...</span>
+                </div>
+                <div class="video-label">
+                    <i class="fas fa-globe"></i>
+                    <span id="remoteLabel">Desconocido</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn" id="toggleVideoBtn">
+                <i class="fas fa-video"></i>
+                <span>CAMARA</span>
+            </button>
+            <button class="control-btn" id="toggleAudioBtn">
+                <i class="fas fa-microphone"></i>
+                <span>MICRO</span>
+            </button>
+            <button class="control-btn primary" id="nextBtn">
+                <i class="fas fa-forward"></i>
+                <span>SIGUIENTE</span>
+            </button>
+            <button class="control-btn danger" id="stopBtn">
+                <i class="fas fa-stop"></i>
+                <span>PARAR</span>
+            </button>
+        </div>
+
+        <!-- Searching Overlay -->
+        <div class="searching-overlay" id="searchingOverlay">
+            <div class="searching-spinner"></div>
+            <div class="searching-text">Buscando usuario...</div>
+            <div class="searching-subtext">Conectando con alguien aleatorio</div>
+            <button class="cancel-search-btn" id="cancelSearchBtn">CANCELAR</button>
+        </div>
+    </div>
+
+    <!-- Permission Modal -->
+    <div class="permission-modal" id="permissionModal">
+        <div class="permission-content">
+            <i class="fas fa-video"></i>
+            <h2>Permitir Camara</h2>
+            <p>Para usar Camera Global necesitas permitir el acceso a tu camara y microfono. Haz clic en "Permitir" cuando el navegador te lo pida.</p>
+            <button class="permission-btn" id="requestPermissionBtn">ACTIVAR CAMARA</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getFirestore, collection, doc, setDoc, getDoc, deleteDoc, 
+            onSnapshot, updateDoc, serverTimestamp, query, where, getDocs
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyALAhNdKWPNa6pyALvXLpNDx_5g3cZ-RYs",
+            authDomain: "chat-global-e5b48.firebaseapp.com",
+            projectId: "chat-global-e5b48",
+            storageBucket: "chat-global-e5b48.firebasestorage.app",
+            messagingSenderId: "556197416000",
+            appId: "1:556197416000:web:c3f599481ef4be25c363a5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // WebRTC Config with free STUN servers
+        const rtcConfig = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
+            ]
+        };
+
+        // DOM Elements
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const localPlaceholder = document.getElementById('localPlaceholder');
+        const remotePlaceholder = document.getElementById('remotePlaceholder');
+        const localVideoBox = document.getElementById('localVideoBox');
+        const remoteVideoBox = document.getElementById('remoteVideoBox');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const onlineCount = document.getElementById('onlineCount');
+        const userDisplay = document.getElementById('userDisplay');
+        const localLabel = document.getElementById('localLabel');
+        const remoteLabel = document.getElementById('remoteLabel');
+        const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+        const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const searchingOverlay = document.getElementById('searchingOverlay');
+        const cancelSearchBtn = document.getElementById('cancelSearchBtn');
+        const permissionModal = document.getElementById('permissionModal');
+        const requestPermissionBtn = document.getElementById('requestPermissionBtn');
+
+        // State
+        let localStream = null;
+        let peerConnection = null;
+        let currentRoomId = null;
+        let currentUser = 'Visitante';
+        let myUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+        let isVideoEnabled = true;
+        let isAudioEnabled = true;
+        let unsubscribeRoom = null;
+        let isSearching = false;
+
+        // Create particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 15) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Get username
+        function getUserName() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('martinChaterUser'));
+                if (userData && userData.name) {
+                    return userData.name;
+                }
+            } catch(e) {}
+            return 'Visitante';
+        }
+
+        // Initialize
+        currentUser = getUserName();
+        userDisplay.textContent = currentUser;
+        localLabel.textContent = currentUser;
+        createParticles();
+
+        // Show permission modal on start
+        permissionModal.classList.add('active');
+
+        // Request camera permission
+        requestPermissionBtn.addEventListener('click', async () => {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                localVideo.srcObject = localStream;
+                localPlaceholder.style.display = 'none';
+                localVideoBox.classList.add('active');
+                permissionModal.classList.remove('active');
+                
+                updateStatus('connected', 'Camara activa');
+                
+                // Start looking for partners
+                startSearching();
+                
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                alert('No se pudo acceder a la camara. Por favor, permite el acceso e intenta de nuevo.');
+            }
+        });
+
+        // Update status
+        function updateStatus(state, text) {
+            statusText.textContent = text;
+            statusDot.className = 'status-dot';
+            if (state === 'searching') {
+                statusDot.classList.add('searching');
+            } else if (state === 'disconnected') {
+                statusDot.classList.add('disconnected');
+            }
+        }
+
+        // Start searching for a partner
+        async function startSearching() {
+            if (isSearching) return;
+            isSearching = true;
+            
+            searchingOverlay.classList.add('active');
+            updateStatus('searching', 'Buscando...');
+            
+            // Clean up previous connection
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            
+            if (unsubscribeRoom) {
+                unsubscribeRoom();
+                unsubscribeRoom = null;
+            }
+            
+            // Remove from previous room
+            if (currentRoomId) {
+                try {
+                    await deleteDoc(doc(db, 'videochat_rooms', currentRoomId));
+                } catch (e) {}
+                currentRoomId = null;
+            }
+            
+            remoteVideo.srcObject = null;
+            remotePlaceholder.style.display = 'flex';
+            remoteVideoBox.classList.remove('active');
+            remoteLabel.textContent = 'Desconocido';
+            
+            // Look for available room or create one
+            try {
+                const roomsRef = collection(db, 'videochat_rooms');
+                const q = query(roomsRef, where('status', '==', 'waiting'));
+                const snapshot = await getDocs(q);
+                
+                if (!snapshot.empty) {
+                    // Join existing room
+                    const roomDoc = snapshot.docs[0];
+                    currentRoomId = roomDoc.id;
+                    const roomData = roomDoc.data();
+                    
+                    // Don't join own room
+                    if (roomData.creator !== myUserId) {
+                        await joinRoom(currentRoomId, roomData);
+                        return;
+                    }
+                }
+                
+                // Create new room
+                await createRoom();
+                
+            } catch (err) {
+                console.error('Error searching:', err);
+                searchingOverlay.classList.remove('active');
+                isSearching = false;
+                updateStatus('disconnected', 'Error de conexion');
+            }
+        }
+
+        // Create a new room
+        async function createRoom() {
+            currentRoomId = 'room_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            peerConnection = new RTCPeerConnection(rtcConfig);
+            setupPeerConnection();
+            
+            // Add local tracks
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+            
+            // Create offer
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            
+            // Save room to Firebase
+            await setDoc(doc(db, 'videochat_rooms', currentRoomId), {
+                creator: myUserId,
+                creatorName: currentUser,
+                offer: {
+                    type: offer.type,
+                    sdp: offer.sdp
+                },
+                status: 'waiting',
+                createdAt: serverTimestamp()
+            });
+            
+            // Listen for answer
+            unsubscribeRoom = onSnapshot(doc(db, 'videochat_rooms', currentRoomId), async (snapshot) => {
+                const data = snapshot.data();
+                if (!data) return;
+                
+                if (data.answer && !peerConnection.currentRemoteDescription) {
+                    const answer = new RTCSessionDescription(data.answer);
+                    await peerConnection.setRemoteDescription(answer);
+                    
+                    searchingOverlay.classList.remove('active');
+                    isSearching = false;
+                    updateStatus('connected', 'Conectado');
+                    remoteLabel.textContent = data.joinerName || 'Desconocido';
+                }
+                
+                // Handle ICE candidates from joiner
+                if (data.joinerCandidates) {
+                    data.joinerCandidates.forEach(async (candidate) => {
+                        try {
+                            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                        } catch (e) {}
+                    });
+                }
+            });
+            
+            // Collect ICE candidates
+            const creatorCandidates = [];
+            peerConnection.onicecandidate = async (event) => {
+                if (event.candidate) {
+                    creatorCandidates.push(event.candidate.toJSON());
+                    await updateDoc(doc(db, 'videochat_rooms', currentRoomId), {
+                        creatorCandidates: creatorCandidates
+                    });
+                }
+            };
+        }
+
+        // Join existing room
+        async function joinRoom(roomId, roomData) {
+            peerConnection = new RTCPeerConnection(rtcConfig);
+            setupPeerConnection();
+            
+            // Add local tracks
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+            
+            // Set remote offer
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(roomData.offer));
+            
+            // Create answer
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            
+            // Save answer to Firebase
+            await updateDoc(doc(db, 'videochat_rooms', roomId), {
+                joiner: myUserId,
+                joinerName: currentUser,
+                answer: {
+                    type: answer.type,
+                    sdp: answer.sdp
+                },
+                status: 'connected'
+            });
+            
+            searchingOverlay.classList.remove('active');
+            isSearching = false;
+            updateStatus('connected', 'Conectado');
+            remoteLabel.textContent = roomData.creatorName || 'Desconocido';
+            
+            // Collect ICE candidates
+            const joinerCandidates = [];
+            peerConnection.onicecandidate = async (event) => {
+                if (event.candidate) {
+                    joinerCandidates.push(event.candidate.toJSON());
+                    await updateDoc(doc(db, 'videochat_rooms', roomId), {
+                        joinerCandidates: joinerCandidates
+                    });
+                }
+            };
+            
+            // Handle ICE candidates from creator
+            if (roomData.creatorCandidates) {
+                roomData.creatorCandidates.forEach(async (candidate) => {
+                    try {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                    } catch (e) {}
+                });
+            }
+            
+            // Listen for more candidates
+            unsubscribeRoom = onSnapshot(doc(db, 'videochat_rooms', roomId), async (snapshot) => {
+                const data = snapshot.data();
+                if (!data) {
+                    // Room deleted, search again
+                    startSearching();
+                    return;
+                }
+                
+                if (data.creatorCandidates) {
+                    data.creatorCandidates.forEach(async (candidate) => {
+                        try {
+                            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                        } catch (e) {}
+                    });
+                }
+            });
+        }
+
+        // Setup peer connection handlers
+        function setupPeerConnection() {
+            peerConnection.ontrack = (event) => {
+                remoteVideo.srcObject = event.streams[0];
+                remotePlaceholder.style.display = 'none';
+                remoteVideoBox.classList.add('active');
+            };
+            
+            peerConnection.oniceconnectionstatechange = () => {
+                if (peerConnection.iceConnectionState === 'disconnected' || 
+                    peerConnection.iceConnectionState === 'failed') {
+                    updateStatus('disconnected', 'Desconectado');
+                    remotePlaceholder.style.display = 'flex';
+                    remotePlaceholder.innerHTML = '<i class="fas fa-user-slash"></i><span>Usuario desconectado</span>';
+                    remoteVideoBox.classList.remove('active');
+                }
+            };
+        }
+
+        // Toggle video
+        toggleVideoBtn.addEventListener('click', () => {
+            if (!localStream) return;
+            
+            isVideoEnabled = !isVideoEnabled;
+            localStream.getVideoTracks().forEach(track => {
+                track.enabled = isVideoEnabled;
+            });
+            
+            toggleVideoBtn.innerHTML = isVideoEnabled 
+                ? '<i class="fas fa-video"></i><span>CAMARA</span>'
+                : '<i class="fas fa-video-slash"></i><span>CAMARA</span>';
+        });
+
+        // Toggle audio
+        toggleAudioBtn.addEventListener('click', () => {
+            if (!localStream) return;
+            
+            isAudioEnabled = !isAudioEnabled;
+            localStream.getAudioTracks().forEach(track => {
+                track.enabled = isAudioEnabled;
+            });
+            
+            toggleAudioBtn.innerHTML = isAudioEnabled 
+                ? '<i class="fas fa-microphone"></i><span>MICRO</span>'
+                : '<i class="fas fa-microphone-slash"></i><span>MICRO</span>';
+        });
+
+        // Next button - find new partner
+        nextBtn.addEventListener('click', () => {
+            startSearching();
+        });
+
+        // Stop button
+        stopBtn.addEventListener('click', () => {
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            
+            if (unsubscribeRoom) {
+                unsubscribeRoom();
+            }
+            
+            if (currentRoomId) {
+                deleteDoc(doc(db, 'videochat_rooms', currentRoomId));
+                currentRoomId = null;
+            }
+            
+            remoteVideo.srcObject = null;
+            remotePlaceholder.style.display = 'flex';
+            remotePlaceholder.innerHTML = '<i class="fas fa-user-slash"></i><span>Esperando conexion...</span>';
+            remoteVideoBox.classList.remove('active');
+            
+            searchingOverlay.classList.remove('active');
+            isSearching = false;
+            updateStatus('disconnected', 'Detenido');
+        });
+
+        // Cancel search
+        cancelSearchBtn.addEventListener('click', () => {
+            searchingOverlay.classList.remove('active');
+            isSearching = false;
+            
+            if (currentRoomId) {
+                deleteDoc(doc(db, 'videochat_rooms', currentRoomId));
+                currentRoomId = null;
+            }
+            
+            updateStatus('connected', 'Busqueda cancelada');
+        });
+
+        // Clean up on page leave
+        window.addEventListener('beforeunload', () => {
+            if (currentRoomId) {
+                deleteDoc(doc(db, 'videochat_rooms', currentRoomId));
+            }
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+        });
+
+        // Update online count periodically
+        async function updateOnlineCount() {
+            try {
+                const roomsRef = collection(db, 'videochat_rooms');
+                const snapshot = await getDocs(roomsRef);
+                const count = snapshot.size * 2; // Approximate users
+                onlineCount.textContent = `~${count} usuarios online`;
+            } catch (e) {}
+        }
+        
+        setInterval(updateOnlineCount, 10000);
+        updateOnlineCount();
+    </script>
+</body>
+</html>
