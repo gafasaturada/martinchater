@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Chater - Conecta Ahora</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+
+        /* FONDO CON IMAGEN */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover;
+            opacity: 0.3;
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* TÍTULO BRILLANTE - MARTIN CHATER */
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite, glow 2s ease-in-out infinite alternate;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
+            to { filter: drop-shadow(0 0 30px rgba(255,255,255,0.8)); }
+        }
+
+        /* IMAGEN CENTRAL CON BRILLO */
+        .main-image {
+            width: clamp(200px, 40vw, 350px);
+            height: auto;
+            margin: 40px 0;
+            filter: drop-shadow(0 25px 40px rgba(0,0,0,0.3));
+            animation: bounce 2s ease-in-out infinite;
+            border: 5px solid transparent;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            padding: 10px;
+            box-shadow: 
+                0 0 50px rgba(255,107,107,0.6),
+                0 0 100px rgba(78,205,196,0.4),
+                inset 0 0 50px rgba(255,255,255,0.2);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        /* BOTÓN BRILLANTE */
+        .login-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            background-size: 300% 300%;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            box-shadow: 
+                0 20px 40px rgba(255,107,107,0.4),
+                0 0 60px rgba(78,205,196,0.3),
+                inset 0 2px 0 rgba(255,255,255,0.3);
+            animation: pulse 2s infinite, gradientShift 3s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 30px 60px rgba(255,107,107,0.6),
+                0 0 100px rgba(78,205,196,0.5);
+        }
+
+        .login-btn:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 20px 40px rgba(255,107,107,0.4), 0 0 60px rgba(78,205,196,0.3); }
+            50% { box-shadow: 0 20px 40px rgba(255,107,107,0.6), 0 0 80px rgba(78,205,196,0.5); }
+            100% { box-shadow: 0 20px 40px rgba(255,107,107,0.4), 0 0 60px rgba(78,205,196,0.3); }
+        }
+
+        /* SUBTÍTULO */
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-top: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: fadeInUp 1.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .login-btn { padding: 15px 30px; font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-comments"></i> Martin Chater</h1>
+        
+        <!-- ✅ CAMBIADO: Ahora usa logo.png de tu carpeta -->
+        <img src="logo.png" 
+             alt="Martin Chater Logo" 
+             class="main-image" 
+             id="mainImage">
+        
+        <a href="login.html" class="login-btn">
+            <i class="fas fa-sign-in-alt"></i>
+            Entrar al Chat
+        </a>
+        
+        <p class="subtitle">Conecta con quien quieras, ahora mismo ✨</p>
+    </div>
+
+    <script>
+        // EFECTO PARTICULAS
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: fixed;
+                width: 4px; height: 4px;
+                background: radial-gradient(circle, #ff6b6b, transparent);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 10;
+                left: ${Math.random() * 100}vw;
+                animation: particleFloat 6s linear infinite;
+            `;
+            document.body.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 6000);
+        }
+        
+        function randomParticle() {
+            if (Math.random() < 0.3) createParticle();
+        }
+        
+        setInterval(randomParticle, 300);
+    </script>
+</body>
+</html>

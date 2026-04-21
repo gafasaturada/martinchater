@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Chater - Categorías</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111111;
+            --surface2: #1a1a1a;
+            --border: #222222;
+            --red: #cc2200;
+            --red-dim: rgba(204,34,0,0.15);
+            --red-glow: rgba(204,34,0,0.35);
+            --text: #e8e8e8;
+            --text-dim: #666666;
+            --sidebar-w: 72px;
+            --topbar-h: 64px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Grain overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.4;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 8px;
+        }
+
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            top: 0; right: -1px;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, var(--red), transparent);
+            opacity: 0.6;
+        }
+
+        .sidebar-logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            object-fit: cover;
+        }
+
+        .sidebar-divider {
+            width: 32px;
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: var(--topbar-h);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+        }
+
+        .topbar::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--red), transparent 60%);
+            opacity: 0.5;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            color: var(--text);
+            opacity: 0.5;
+        }
+
+        .topbar-sep {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+        }
+
+        .breadcrumb {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .breadcrumb span {
+            color: var(--red);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .coins-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e8c84a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coins-display::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(232,200,74,0.05), transparent);
+        }
+
+        .coins-display i { font-size: 0.8rem; }
+
+        .topbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .topbar-btn:hover {
+            background: var(--surface2);
+            color: var(--text);
+            border-color: #333;
+        }
+
+        .topbar-btn.danger:hover {
+            background: var(--red-dim);
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--topbar-h);
+            height: calc(100vh - var(--topbar-h));
+            padding: 48px 56px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section-header {
+            margin-bottom: 40px;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            max-width: 40px;
+            height: 1px;
+            background: var(--red);
+            opacity: 0.5;
+        }
+
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            letter-spacing: 4px;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        /* GRID */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 16px;
+            flex: 1;
+            max-height: calc(100vh - var(--topbar-h) - 160px);
+        }
+
+        /* CATEGORY CARD */
+        .category-card {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 28px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .category-card:nth-child(1) { animation-delay: 0.05s; }
+        .category-card:nth-child(2) { animation-delay: 0.10s; }
+        .category-card:nth-child(3) { animation-delay: 0.15s; }
+        .category-card:nth-child(4) { animation-delay: 0.20s; }
+        .category-card:nth-child(5) { animation-delay: 0.25s; }
+        .category-card:nth-child(6) { animation-delay: 0.30s; }
+
+        /* Top-right number */
+        .card-number {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            color: var(--border);
+            line-height: 1;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        /* Icon */
+        .card-icon {
+            font-size: 1.6rem;
+            margin-bottom: 14px;
+            color: var(--text-dim);
+            transition: color 0.3s ease;
+        }
+
+        .card-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            line-height: 1;
+            margin-bottom: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .card-desc {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        /* Red accent line at bottom */
+        .card-line {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--red);
+            transition: width 0.4s ease;
+        }
+
+        /* Corner bracket */
+        .card-corner {
+            position: absolute;
+            top: 16px; left: 16px;
+            width: 16px; height: 16px;
+            border-top: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+            transition: border-color 0.3s ease;
+        }
+
+        /* Hover state */
+        .category-card:hover {
+            border-color: #2a2a2a;
+            background: #131313;
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(204,34,0,0.1);
+        }
+
+        .category-card:hover .card-line { width: 100%; }
+        .category-card:hover .card-number { color: var(--red-dim); }
+        .category-card:hover .card-icon { color: var(--red); }
+        .category-card:hover .card-name { color: #ffffff; }
+        .category-card:hover .card-corner { border-color: var(--red); opacity: 0.6; }
+
+        /* COMING SOON */
+        .category-card.locked {
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        .locked-badge {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 3px 10px;
+            border-radius: 2px;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .categories-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr); }
+            .main-content { padding: 32px 24px; }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar { width: 56px; }
+            :root { --sidebar-w: 56px; }
+            .categories-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <img src="logo2.png" alt="Logo" class="sidebar-logo">
+        <div class="sidebar-divider"></div>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="topbar-title">MARTIN CHATER</span>
+            <div class="topbar-sep"></div>
+            <span class="breadcrumb">Inicio / <span>Categorías</span></span>
+        </div>
+        <div class="topbar-right">
+            <div class="coins-display" id="coinsDisplay">
+                <i class="fas fa-coins"></i>
+                <span id="coinsAmount">5000</span>
+            </div>
+            <a href="inicio.html" class="topbar-btn">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <a href="cuenta.html" class="topbar-btn">
+                <i class="fas fa-user"></i> Cuenta
+            </a>
+            <button class="topbar-btn danger" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+        <div class="section-header">
+            <div class="section-label">Martin Chater</div>
+            <h1 class="section-title">CATEGORÍAS</h1>
+        </div>
+
+        <div class="categories-grid">
+
+            <!-- 1 CHAT -->
+            <a href="categoria1.html" class="category-card">
+                <div class="card-corner"></div>
+                <div class="card-number">01</div>
+                <div class="card-icon"><i class="fas fa-comments"></i></div>
+                <div class="card-name">CHAT</div>
+                <div class="card-desc">Chat global en tiempo real</div>
+                <div class="card-line"></div>
+            </a>
+
+            <!-- 2 TIENDA -->
+            <a href="categoria2.html" class="category-card locked">
+                <div class="card-corner"></div>
+                <div class="card-number">02</div>
+                <div class="locked-badge">Próximamente</div>
+                <div class="card-icon"><i class="fas fa-store"></i></div>
+                <div class="card-name">TIENDA</div>
+                <div class="card-desc">Compra mejoras con tus monedas</div>
+                <div class="card-line"></div>
+            </a>
+
+            <!-- 3 MINIJUEGOS -->
+            <a href="categoria3.html" class="category-card locked">
+                <div class="card-corner"></div>
+                <div class="card-number">03</div>
+                <div class="locked-badge">Próximamente</div>
+                <div class="card-icon"><i class="fas fa-gamepad"></i></div>
+                <div class="card-name">MINIJUEGOS</div>
+                <div class="card-desc">Juega y gana monedas</div>
+                <div class="card-line"></div>
+            </a>
+
+            <!-- 4 RANKING -->
+            <a href="categoria4.html" class="category-card locked">
+                <div class="card-corner"></div>
+                <div class="card-number">04</div>
+                <div class="locked-badge">Próximamente</div>
+                <div class="card-icon"><i class="fas fa-trophy"></i></div>
+                <div class="card-name">RANKING</div>
+                <div class="card-desc">Clasificación de jugadores</div>
+                <div class="card-line"></div>
+            </a>
+
+            <!-- 5 PERFIL -->
+            <a href="cuenta.html" class="category-card">
+                <div class="card-corner"></div>
+                <div class="card-number">05</div>
+                <div class="card-icon"><i class="fas fa-user-circle"></i></div>
+                <div class="card-name">PERFIL</div>
+                <div class="card-desc">Tu cuenta y estadísticas</div>
+                <div class="card-line"></div>
+            </a>
+
+            <!-- 6 MÁS -->
+            <a href="categoria6.html" class="category-card locked">
+                <div class="card-corner"></div>
+                <div class="card-number">06</div>
+                <div class="locked-badge">Próximamente</div>
+                <div class="card-icon"><i class="fas fa-ellipsis-h"></i></div>
+                <div class="card-name">MÁS</div>
+                <div class="card-desc">Contenido extra</div>
+                <div class="card-line"></div>
+            </a>
+
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'martinChaterUser';
+
+        function loadUserData() {
+            const savedUser = localStorage.getItem(STORAGE_KEY);
+            if (!savedUser) { window.location.href = 'login.html'; return null; }
+            return JSON.parse(savedUser);
+        }
+
+        function updateCoinsDisplay() {
+            const userData = loadUserData();
+            if (userData) document.getElementById('coinsAmount').textContent = userData.coins ?? 5000;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem(STORAGE_KEY);
+            window.location.href = 'login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', updateCoinsDisplay);
+    </script>
+</body>
+</html>

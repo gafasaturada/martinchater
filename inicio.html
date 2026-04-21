@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Chater - Inicio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111111;
+            --surface2: #1a1a1a;
+            --border: #222222;
+            --red: #cc2200;
+            --red-dim: rgba(204,34,0,0.15);
+            --red-glow: rgba(204,34,0,0.25);
+            --text: #e8e8e8;
+            --text-dim: #666666;
+            --sidebar-w: 72px;
+            --topbar-h: 64px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Grain overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.4;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            top: 0; right: -1px;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, var(--red), transparent);
+            opacity: 0.6;
+        }
+
+        .sidebar-logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            object-fit: cover;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: var(--topbar-h);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+        }
+
+        .topbar::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--red), transparent 60%);
+            opacity: 0.5;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            color: var(--text);
+            opacity: 0.5;
+        }
+
+        .topbar-sep {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+        }
+
+        .breadcrumb {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .breadcrumb span { color: var(--red); }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .coins-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e8c84a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coins-display::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(232,200,74,0.05), transparent);
+        }
+
+        .coins-display i { font-size: 0.8rem; }
+
+        .topbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .topbar-btn:hover {
+            background: var(--surface2);
+            color: var(--text);
+            border-color: #333;
+        }
+
+        .topbar-btn.danger:hover {
+            background: var(--red-dim);
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--topbar-h);
+            height: calc(100vh - var(--topbar-h));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background grid lines */
+        .main-content::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        /* Red center glow */
+        .main-content::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--red-glow) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .center-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 48px;
+            animation: fadeUp 0.8s ease both;
+        }
+
+        /* LOGO AREA */
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-frame {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Rotating border */
+        .logo-frame::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 12px;
+            background: conic-gradient(from 0deg, var(--red), transparent 40%, var(--red) 60%, transparent);
+            animation: rotateBorder 6s linear infinite;
+            z-index: -1;
+        }
+
+        .logo-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--bg);
+            border-radius: 10px;
+            z-index: -1;
+        }
+
+        @keyframes rotateBorder {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        .main-logo {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Corner brackets */
+        .corner { position: absolute; width: 14px; height: 14px; }
+        .corner-tl { top: 6px;  left: 6px;  border-top: 1px solid var(--red); border-left: 1px solid var(--red); }
+        .corner-tr { top: 6px;  right: 6px; border-top: 1px solid var(--red); border-right: 1px solid var(--red); }
+        .corner-bl { bottom: 6px; left: 6px;  border-bottom: 1px solid var(--red); border-left: 1px solid var(--red); }
+        .corner-br { bottom: 6px; right: 6px; border-bottom: 1px solid var(--red); border-right: 1px solid var(--red); }
+
+        .site-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            letter-spacing: 8px;
+            color: var(--text);
+            text-align: center;
+            line-height: 1;
+        }
+
+        .site-title span {
+            color: var(--red);
+        }
+
+        .site-subtitle {
+            font-size: 0.72rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            text-align: center;
+        }
+
+        /* CATEGORIES BUTTON */
+        .categories-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 40px;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .categories-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: var(--red);
+            transition: width 0.4s ease;
+        }
+
+        .categories-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--red-dim);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .categories-btn:hover {
+            border-color: #2a2a2a;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+        }
+
+        .categories-btn:hover::before { width: 100%; }
+        .categories-btn:hover::after  { opacity: 1; }
+
+        .categories-btn i {
+            position: relative;
+            z-index: 1;
+            color: var(--red);
+            font-size: 1rem;
+        }
+
+        .categories-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            animation: fadeUp 0.8s 0.2s ease both;
+            opacity: 0;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .status-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #2a2a2a;
+        }
+
+        .status-dot.online {
+            background: #22c55e;
+            box-shadow: 0 0 6px rgba(34,197,94,0.6);
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+
+        .status-sep {
+            width: 1px;
+            height: 12px;
+            background: var(--border);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            :root { --sidebar-w: 56px; }
+            .logo-frame { width: 120px; height: 120px; }
+            .main-logo { width: 96px; height: 96px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <img src="logo2.png" alt="Logo" class="sidebar-logo">
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="topbar-title">MARTIN CHATER</span>
+            <div class="topbar-sep"></div>
+            <span class="breadcrumb"><span>Inicio</span></span>
+        </div>
+        <div class="topbar-right">
+            <div class="coins-display">
+                <i class="fas fa-coins"></i>
+                <span id="coinsAmount">5000</span>
+            </div>
+            <a href="cuenta.html" class="topbar-btn">
+                <i class="fas fa-user"></i> Mi Cuenta
+            </a>
+            <button class="topbar-btn danger" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+        <div class="center-wrapper">
+
+            <div class="logo-area">
+                <div class="logo-frame">
+                    <div class="corner corner-tl"></div>
+                    <div class="corner corner-tr"></div>
+                    <div class="corner corner-bl"></div>
+                    <div class="corner corner-br"></div>
+                    <img src="logo.png" alt="Martin Chater" class="main-logo">
+                </div>
+                <div>
+                    <div class="site-title">MARTIN <span>CHATER</span></div>
+                    <div class="site-subtitle">Conecta con quien quieras</div>
+                </div>
+            </div>
+
+            <a href="categorias.html" class="categories-btn">
+                <i class="fas fa-th-large"></i>
+                <span>Categorías</span>
+            </a>
+
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-dot online"></div>
+                    Conectado
+                </div>
+                <div class="status-sep"></div>
+                <div class="status-item" id="userName">
+                    <i class="fas fa-user" style="font-size:0.6rem"></i>
+                    <span id="userNameText">—</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'martinChaterUser';
+
+        function loadUserData() {
+            const savedUser = localStorage.getItem(STORAGE_KEY);
+            if (!savedUser) { window.location.href = 'login.html'; return null; }
+            return JSON.parse(savedUser);
+        }
+
+        function updateCoinsDisplay() {
+            const userData = loadUserData();
+            if (userData) {
+                document.getElementById('coinsAmount').textContent = userData.coins ?? 5000;
+                document.getElementById('userNameText').textContent = userData.name || '—';
+            }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem(STORAGE_KEY);
+            window.location.href = 'login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', updateCoinsDisplay);
+    </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Global - Martin Chater</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #ffffff;
+            color: #000;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #f0f0f0;
+            padding: 15px 20px;
+            border-bottom: 2px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .exit-btn {
+            background: #666; color: #fff; border: none;
+            padding: 10px 20px; cursor: pointer; border-radius: 5px;
+            font-weight: bold;
+        }
+        .exit-btn:hover { background: #555; }
+        .chat-container { 
+            flex: 1; display: flex; flex-direction: column; 
+            max-width: 1000px; margin: 0 auto; width: 100%; 
+        }
+        .messages {
+            flex: 1; padding: 20px; overflow-y: auto; background: #fafafa;
+            border-bottom: 1px solid #eee;
+        }
+        .message {
+            margin-bottom: 15px; padding: 15px; background: #fff;
+            border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .message.mine { border-left: 5px solid #28a745; }
+        .message.other { border-left: 5px solid #007bff; }
+        .message strong { font-size: 15px; }
+        .message .time { color: #666; font-size: 13px; margin-left: 10px; }
+        .input-area {
+            padding: 20px; background: #f8f9fa; display: flex; gap: 10px;
+            border-top: 1px solid #ddd;
+        }
+        #messageInput {
+            flex: 1; background: #fff; border: 2px solid #ddd; color: #000;
+            padding: 15px; border-radius: 8px; resize: vertical; 
+            min-height: 60px; font-size: 16px; font-family: Arial, sans-serif;
+        }
+        #messageInput:focus { 
+            outline: none; border-color: #007bff; 
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        #sendBtn {
+            background: #28a745; color: #fff; border: none; 
+            padding: 18px 30px; cursor: pointer; border-radius: 8px; 
+            font-weight: bold; font-size: 16px;
+        }
+        #sendBtn:hover:not(:disabled) { background: #218838; }
+        #sendBtn:disabled { background: #ccc; cursor: not-allowed; }
+        .online-count {
+            background: #e9ecef; color: #495057; font-size: 14px;
+            padding: 12px 20px; text-align: center;
+        }
+        .debug { 
+            background: #d4edda; color: #155724; padding: 10px; 
+            font-size: 14px; text-align: center; border-bottom: 1px solid #c3e6cb;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .input-area { flex-direction: column; }
+            #sendBtn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>💬 Chat Global <span id="userDisplay"></span></h2>
+        <button class="exit-btn" onclick="location.href='categorias.html'">Salir</button>
+    </div>
+    
+    <div class="chat-container">
+        <div class="debug" id="debug">🔄 Conectando...</div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <textarea id="messageInput" placeholder="Escribe tu mensaje... (Enter para enviar)" rows="2"></textarea>
+            <button id="sendBtn">ENVIAR</button>
+        </div>
+        <div class="online-count" id="onlineCount">Cargando...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getFirestore, collection, addDoc, onSnapshot, 
+            orderBy, query, limitToLast, serverTimestamp 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyALAhNdKWPNa6pyALvXLpNDx_5g3cZ-RYs",
+            authDomain: "chat-global-e5b48.firebaseapp.com",
+            projectId: "chat-global-e5b48",
+            storageBucket: "chat-global-e5b48.firebasestorage.app",
+            messagingSenderId: "556197416000",
+            appId: "1:556197416000:web:c3f599481ef4be25c363a5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const messagesEl = document.getElementById('messages');
+        const inputEl = document.getElementById('messageInput');
+        const sendBtnEl = document.getElementById('sendBtn');
+        const debugEl = document.getElementById('debug');
+        const onlineEl = document.getElementById('onlineCount');
+        const userDisplayEl = document.getElementById('userDisplay');
+
+        let currentUser = 'Visitante';
+
+        // 🎯 EXACTAMENTE IGUAL QUE TU LOGIN.HTML
+        function getUserNameFromLoginSystem() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('martinChaterUser'));
+                if (userData && userData.name) {
+                    return userData.name;  // ← "name" del login
+                }
+                return 'Visitante';
+            } catch(e) {
+                console.log('No user logged in');
+                return 'Visitante';
+            }
+        }
+
+        // OBTENER NOMBRE
+        currentUser = getUserNameFromLoginSystem();
+        userDisplayEl.textContent = `| ${currentUser}`;
+        debugEl.textContent = `👤 ${currentUser}`;
+
+        // Add message
+        function addMessage(data) {
+            const div = document.createElement('div');
+            div.className = `message ${data.username === currentUser ? 'mine' : 'other'}`;
+            
+            div.innerHTML = `
+                <div>
+                    <strong>${data.username}</strong>
+                    <span class="time">${new Date(data.time).toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}</span>
+                </div>
+                <div style="margin-top: 8px; word-wrap: break-word; padding: 5px 0;">${data.message}</div>
+            `;
+            
+            messagesEl.appendChild(div);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        // Send message
+        async function sendMessage() {
+            const message = inputEl.value.trim();
+            if (!message) return;
+
+            sendBtnEl.disabled = true;
+            sendBtnEl.textContent = 'Enviando...';
+
+            // Add immediately
+            addMessage({
+                username: currentUser,
+                message: message,
+                time: Date.now()
+            });
+
+            try {
+                await addDoc(collection(db, 'chat'), {
+                    username: currentUser,  // ← Nombre del login
+                    message: message,
+                    time: Date.now(),
+                    timestamp: serverTimestamp()
+                });
+                
+                inputEl.value = '';
+                debugEl.textContent = `✅ "${message.substring(0, 20)}..." enviado`;
+            } catch (error) {
+                debugEl.textContent = `❌ Error: ${error.message}`;
+            }
+
+            sendBtnEl.disabled = false;
+            sendBtnEl.textContent = 'ENVIAR';
+        }
+
+        // Listen messages
+        function listenMessages() {
+            const q = query(collection(db, 'chat'), orderBy('time'), limitToLast(100));
+            
+            onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const data = change.doc.data();
+                        addMessage(data);
+                    }
+                });
+            });
+        }
+
+        // Events
+        sendBtnEl.onclick = sendMessage;
+        inputEl.onkeydown = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        };
+
+        inputEl.oninput = () => {
+            inputEl.style.height = 'auto';
+            inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+        };
+
+        // Start
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                listenMessages();
+                debugEl.textContent = `🟢 Listo ${currentUser}! ¡Chatea!`;
+            }, 500);
+        });
+    </script>
+</body>
+</html>
