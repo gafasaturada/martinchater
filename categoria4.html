@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Chater - Optijuegos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #0d0d0d;
+            --surface2: #151515;
+            --border: #1a1a1a;
+            --green: #00ff66;
+            --green-dim: rgba(0, 255, 102, 0.15);
+            --green-glow: rgba(0, 255, 102, 0.3);
+            --text: #e8e8e8;
+            --text-dim: #666666;
+            --sidebar-w: 72px;
+            --topbar-h: 64px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; /* Permitir scroll en toda la página */
+        }
+
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 100; opacity: 0.3;
+        }
+
+        .sidebar {
+            position: fixed; left: 0; top: 0; width: var(--sidebar-w); height: 100vh;
+            background: var(--surface); border-right: 1px solid var(--border); z-index: 10;
+            display: flex; flex-direction: column; align-items: center; padding: 20px 0;
+        }
+
+        .sidebar::after {
+            content: ''; position: absolute; top: 0; right: -1px; width: 1px; height: 100%;
+            background: linear-gradient(180deg, transparent, var(--green), transparent); opacity: 0.6;
+        }
+
+        .sidebar-logo { width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border); }
+
+        .topbar {
+            position: fixed; top: 0; left: var(--sidebar-w); right: 0; height: var(--topbar-h);
+            background: var(--surface); border-bottom: 1px solid var(--border); z-index: 10;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 32px;
+        }
+
+        .topbar-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 3px; opacity: 0.5; }
+        .breadcrumb { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .breadcrumb span { color: var(--green); }
+
+        .main-content {
+            margin-left: var(--sidebar-w); 
+            margin-top: var(--topbar-h);
+            padding: 40px 10% 120px 10%; /* Aumentado el padding inferior a 120px para el botón */
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            min-height: calc(100vh - var(--topbar-h));
+            position: relative;
+        }
+
+        .section-header { text-align: center; margin-bottom: 40px; animation: fadeIn 0.8s ease; }
+        .section-label { font-size: 0.7rem; letter-spacing: 4px; color: var(--green); text-transform: uppercase; margin-bottom: 8px; }
+        .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 6px; line-height: 1; }
+
+        .games-list {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 2;
+        }
+
+        .game-item {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 18px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            overflow: hidden;
+            border-radius: 4px;
+            animation: slideIn 0.5s ease both;
+        }
+
+        .game-info { display: flex; align-items: center; gap: 20px; }
+        .game-icon { font-size: 1.1rem; color: var(--green); opacity: 0.7; }
+        .game-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 2px; }
+
+        .play-tag {
+            font-size: 0.7rem; letter-spacing: 2px; color: var(--text-dim);
+            border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px;
+        }
+
+        .game-item::before {
+            content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%;
+            background: var(--green); transform: scaleY(0); transition: transform 0.3s ease;
+        }
+
+        .game-item:hover {
+            background: var(--surface2);
+            border-color: var(--green-dim);
+            transform: translateX(10px);
+            box-shadow: -10px 0 30px var(--green-dim);
+        }
+
+        .game-item:hover::before { transform: scaleY(1); }
+        .game-item:hover .game-name { color: #fff; text-shadow: 0 0 10px var(--green-glow); }
+        .game-item:hover .play-tag { border-color: var(--green); color: var(--green); }
+
+        .next-page-btn {
+            position: fixed; /* Cambiado a fixed para que siempre esté visible o al menos no flote mal */
+            bottom: 30px;
+            right: 40px;
+            background: var(--surface);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 12px 24px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            z-index: 1000;
+        }
+
+        .next-page-btn:hover {
+            background: var(--green);
+            color: var(--bg);
+            box-shadow: 0 0 20px var(--green-glow);
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { 
+            from { opacity: 0; transform: translateX(-30px); } 
+            to { opacity: 1; transform: translateX(0); } 
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--green); }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <img src="logo2.png" alt="Logo" class="sidebar-logo">
+    </div>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="topbar-title">MARTIN CHATER</span>
+            <span class="breadcrumb" style="margin-left: 20px;">Catálogo / <span>Optijuegos</span></span>
+        </div>
+        <div class="topbar-right">
+            <a href="categorias.html" style="text-decoration: none; color: var(--text-dim); font-size: 0.8rem; border: 1px solid var(--border); padding: 8px 16px; border-radius: 4px;">
+                <i class="fas fa-arrow-left"></i> VOLVER
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="section-header">
+            <div class="section-label">High Performance</div>
+            <h1 class="section-title">OPTIJUEGOS</h1>
+        </div>
+
+        <div class="games-list">
+            <a href="https://gofile.io/d/eI1AP4" target="_blank" class="game-item">
+                <div class="game-info">
+                    <div class="game-icon"><i class="fas fa-square"></i></div>
+                    <div class="game-name">GEOMETRY DASH</div>
+                </div>
+                <div class="play-tag">EJECUTAR</div>
+            </a>
+
+            <a href="https://titan.mythicmc.org/" target="_blank" class="game-item">
+                <div class="game-info">
+                    <div class="game-icon"><i class="fas fa-cube"></i></div>
+                    <div class="game-name">MINECRAFT</div>
+                </div>
+                <div class="play-tag">EJECUTAR</div>
+            </a>
+
+            <a href="https://www.mediafire.com/file/rnav2185crpfm21" target="_blank" class="game-item">
+                <div class="game-info">
+                    <div class="game-icon"><i class="fas fa-playing-cards"></i></div>
+                    <div class="game-name">BALATRO</div>
+                </div>
+                <div class="play-tag">EJECUTAR</div>
+            </a>
+
+            <a href="https://www.mediafire.com/file/9o5kein19m0vbwv" target="_blank" class="game-item">
+                <div class="game-info">
+                    <div class="game-icon"><i class="fas fa-crosshairs"></i></div>
+                    <div class="game-name">ULTRAKILL</div>
+                </div>
+                <div class="play-tag">EJECUTAR</div>
+            </a>
+
+            <a href="https://bzzhr.to/liksw0ew4pu8" target="_blank" class="game-item">
+                <div class="game-info">
+                    <div class="game-icon"><i class="fas fa-clover"></i></div>
+                    <div class="game-name">CLOVER PIT</div>
+                </div>
+                <div class="play-tag">EJECUTAR</div>
+            </a>
+
+            <a href="https://www.mediafire.com/file/ukva3aqj1en8aok" target="_blank" class="game-item">
+                <div class="game-info">
+                    <div class="game-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="game-name">SUPERMARKET SIMULATOR</div>
+                </div>
+                <div class="play-tag">EJECUTAR</div>
+            </a>
+        </div>
+    </div>
+
+    <a href="categoria4-2.html" class="next-page-btn">
+        SIGUIENTE PÁGINA <i class="fas fa-chevron-right"></i>
+    </a>
+
+</body>
+</html>
