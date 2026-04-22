@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Global - Martin Chater</title>
+    <title>Camera Global + Chat - Martin Chater</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -11,218 +11,125 @@
     <style>
         :root {
             --gold-primary: #e8c84a;
-            --gold-light: #f5e6a3;
             --gold-dark: #c9a227;
-            --white: #ffffff;
-            --off-white: #fafafa;
-            --gray-100: #f5f5f5;
-            --gray-200: #e5e5e5;
-            --gray-400: #a3a3a3;
-            --gray-600: #525252;
-            --gray-800: #262626;
             --gray-900: #171717;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --gray-800: #262626;
+            --white: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #0a0a0a; color: var(--white); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--off-white);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
+        /* HEADER */
+        .header { background: var(--gray-900); border-bottom: 2px solid var(--gold-primary); padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        .logo { font-family: 'Space Grotesk'; font-weight: 700; color: var(--gold-primary); }
 
-        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-        .particle {
-            position: absolute; width: 8px; height: 8px; background: var(--gold-primary);
-            opacity: 0.3; animation: float 20s infinite linear;
-        }
+        /* MAIN LAYOUT */
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.3; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
-        }
-
-        .header {
-            background: var(--white); border-bottom: 3px solid var(--gold-primary);
-            padding: 15px 30px; display: flex; justify-content: space-between;
-            align-items: center; box-shadow: var(--shadow-md); position: relative;
-            z-index: 10; flex-shrink: 0;
-        }
-
-        .logo-icon {
-            width: 50px; height: 50px; background: var(--gray-900); color: var(--gold-primary);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 18px; font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .header-title h1 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: var(--gray-900); }
-        .header-title span { font-size: 12px; color: var(--gold-dark); font-weight: 600; }
-
-        .user-badge {
-            display: flex; align-items: center; gap: 10px; background: var(--gray-100);
-            padding: 10px 20px; border: 2px solid var(--gray-200); font-weight: 600;
-        }
-
-        .user-badge::before {
-            content: ''; width: 10px; height: 10px; background: var(--success);
-            border-radius: 50%; animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-        }
-
-        .exit-btn {
-            background: var(--white); border: 2px solid var(--gray-900);
-            padding: 12px 25px; cursor: pointer; transition: all 0.3s var(--ease-spring);
-            text-decoration: none; color: var(--gray-900); font-weight: 600;
-        }
-
-        .exit-btn:hover { background: var(--gray-900); color: var(--white); }
-
-        .status-bar {
-            background: var(--gray-900); color: var(--white); padding: 10px 30px;
-            display: flex; justify-content: space-between; align-items: center; font-size: 13px;
-        }
-
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
-        .status-dot.searching { background: var(--gold-primary); animation: pulse 1s infinite; }
-        .status-dot.disconnected { background: var(--danger); }
-
-        .main-content { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; position: relative; z-index: 1; }
-
-        .video-container { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-height: calc(100vh - 280px); }
-
-        .video-box {
-            background: var(--gray-900); position: relative; display: flex;
-            align-items: center; justify-content: center; overflow: hidden;
-            border: 3px solid var(--gray-800);
-        }
-
-        .video-box.active { border-color: var(--gold-primary); }
+        /* VIDEO SECTION */
+        .video-section { flex: 1; display: flex; flex-direction: column; padding: 20px; background: #0f0f0f; justify-content: center; align-items: center; }
+        .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 1000px; aspect-ratio: 16/10; }
+        .video-box { background: #000; border: 2px solid var(--gray-800); position: relative; border-radius: 12px; overflow: hidden; height: 100%; }
         .video-box video { width: 100%; height: 100%; object-fit: cover; }
+        .video-label { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 5px 12px; border-radius: 5px; font-size: 12px; z-index: 2; border: 1px solid var(--gold-primary); }
 
-        .video-label {
-            position: absolute; bottom: 15px; left: 15px; background: rgba(0,0,0,0.7);
-            color: var(--white); padding: 8px 15px; font-size: 13px; display: flex; align-items: center; gap: 8px;
-        }
+        /* CHAT SECTION */
+        .chat-section { width: 350px; background: var(--gray-900); border-left: 1px solid var(--gray-800); display: flex; flex-direction: column; }
+        .chat-header { padding: 15px; border-bottom: 1px solid var(--gray-800); font-family: 'Space Grotesk'; font-weight: 600; color: var(--gold-primary); }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .msg-me { align-self: flex-end; background: var(--gold-primary); color: #000; border-bottom-right-radius: 2px; }
+        .msg-them { align-self: flex-start; background: var(--gray-800); color: #fff; border-bottom-left-radius: 2px; }
 
-        .controls {
-            display: flex; justify-content: center; gap: 15px; padding: 15px;
-            background: var(--white); border: 3px solid var(--gold-primary);
-        }
+        .chat-input-area { padding: 15px; border-top: 1px solid var(--gray-800); display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; background: #000; border: 1px solid var(--gray-800); padding: 10px; color: #fff; border-radius: 5px; outline: none; }
+        .chat-input-area input:focus { border-color: var(--gold-primary); }
+        .send-btn { background: var(--gold-primary); border: none; width: 45px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
 
-        .control-btn {
-            padding: 15px 30px; font-weight: 600; border: 2px solid var(--gray-900);
-            background: var(--white); cursor: pointer; transition: all 0.3s var(--ease-spring);
-        }
+        /* CONTROLS */
+        .controls { background: var(--gray-900); padding: 20px; display: flex; justify-content: center; gap: 20px; border-top: 1px solid var(--gray-800); }
+        .btn { padding: 12px 24px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-family: 'Space Grotesk'; }
+        .btn-next { background: var(--gold-primary); color: #000; }
+        .btn-stop { background: #ff4444; color: #fff; }
 
-        .control-btn.primary { background: var(--gold-primary); border-color: var(--gold-dark); }
-        .control-btn.danger { background: var(--danger); color: white; border-color: var(--danger); }
-
-        .searching-overlay {
-            position: absolute; inset: 0; background: rgba(23, 23, 23, 0.95);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 25px; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-        }
-
-        .searching-overlay.active { opacity: 1; pointer-events: auto; }
-        .searching-spinner {
-            width: 80px; height: 80px; border: 4px solid var(--gray-800);
-            border-top-color: var(--gold-primary); border-radius: 50%; animation: spin 1s linear infinite;
-        }
-
+        /* OVERLAYS */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .overlay.active { display: flex; }
+        .spinner { width: 60px; height: 60px; border: 5px solid var(--gray-800); border-top-color: var(--gold-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .permission-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        /* BOTÓN CANCELAR */
+        .btn-cancel-search {
+            margin-top: 30px;
+            background: transparent;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Space Grotesk';
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
         }
+        .btn-cancel-search:hover { background: #ff4444; color: #fff; }
 
-        .permission-modal.active { opacity: 1; pointer-events: auto; }
-        .permission-content { background: var(--white); padding: 40px; text-align: center; border: 3px solid var(--gold-primary); }
-
-        @media (max-width: 768px) {
-            .video-container { grid-template-columns: 1fr; }
+        @media (max-width: 800px) {
+            .main-layout { flex-direction: column; }
+            .video-grid { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; aspect-ratio: auto; height: 100%; }
+            .chat-section { width: 100%; height: 250px; }
         }
     </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
 
     <header class="header">
-        <div class="header-left">
-            <div class="logo-icon">MC</div>
-            <div class="header-title">
-                <h1>Camera Global</h1>
-                <span>MARTIN CHATER</span>
-            </div>
-        </div>
-        <div class="user-badge"><span id="userDisplay">Visitante</span></div>
-        <a href="categorias.html" class="exit-btn">SALIR</a>
+        <div class="logo">MARTIN CHATER | <span style="color: #fff">CAMERA GLOBAL</span></div>
+        <div id="statusText" style="font-size: 0.8rem; color: var(--gold-primary); letter-spacing: 1px;">SISTEMA ACTIVO</div>
     </header>
 
-    <div class="status-bar">
-        <div class="status-indicator">
-            <div class="status-dot" id="statusDot"></div>
-            <span id="statusText">Esperando...</span>
-        </div>
-        <div id="onlineCount">0 usuarios online</div>
-    </div>
-
-    <div class="main-content">
-        <div class="video-container">
-            <div class="video-box" id="localVideoBox">
-                <video id="localVideo" autoplay muted playsinline></video>
-                <div class="video-label"><i class="fas fa-user"></i><span id="localLabel">Tu</span></div>
-            </div>
-            <div class="video-box" id="remoteVideoBox">
-                <video id="remoteVideo" autoplay playsinline></video>
-                <div class="video-label"><i class="fas fa-globe"></i><span id="remoteLabel">Desconocido</span></div>
+    <div class="main-layout">
+        <div class="video-section">
+            <div class="video-grid">
+                <div class="video-box">
+                    <video id="localVideo" autoplay muted playsinline></video>
+                    <div class="video-label">TÚ (CÁMARA LOCAL)</div>
+                </div>
+                <div class="video-box">
+                    <video id="remoteVideo" autoplay playsinline></video>
+                    <div class="video-label">EXTRAÑO (CÁMARA REMOTA)</div>
+                </div>
             </div>
         </div>
 
-        <div class="controls">
-            <button class="control-btn" id="toggleVideoBtn"><i class="fas fa-video"></i> <span>CAMARA</span></button>
-            <button class="control-btn" id="toggleAudioBtn"><i class="fas fa-microphone"></i> <span>MICRO</span></button>
-            <button class="control-btn primary" id="nextBtn"><i class="fas fa-forward"></i> <span>SIGUIENTE</span></button>
-            <button class="control-btn danger" id="stopBtn"><i class="fas fa-stop"></i> <span>PARAR</span></button>
-        </div>
-
-        <div class="searching-overlay" id="searchingOverlay">
-            <div class="searching-spinner"></div>
-            <div class="searching-text" style="color:white">Buscando usuario...</div>
-            <button class="control-btn" id="cancelSearchBtn">CANCELAR</button>
+        <div class="chat-section">
+            <div class="chat-header"><i class="fas fa-comment-dots"></i> CHAT EN VIVO</div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <form class="chat-input-area" id="chatForm">
+                <input type="text" id="chatInput" placeholder="Escribe un mensaje..." autocomplete="off">
+                <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </form>
         </div>
     </div>
 
-    <div class="permission-modal" id="permissionModal">
-        <div class="permission-content">
-            <i class="fas fa-video" style="font-size: 40px; color: var(--gold-primary)"></i>
-            <h2>Permitir Camara</h2>
-            <p>Necesitas activar tu cámara para continuar.</p><br>
-            <button class="control-btn primary" id="requestPermissionBtn">ACTIVAR</button>
-        </div>
+    <div class="controls">
+        <button class="btn btn-next" id="nextBtn"><i class="fas fa-forward"></i> SIGUIENTE PERSONA</button>
+        <button class="btn btn-stop" onclick="location.href='categorias.html'"><i class="fas fa-times"></i> ABANDONAR</button>
+    </div>
+
+    <div class="overlay" id="searchingOverlay">
+        <div class="spinner"></div>
+        <p style="margin-top: 20px; font-family: 'Space Grotesk'; letter-spacing: 2px;">BUSCANDO PAREJA...</p>
+        <button class="btn-cancel-search" id="cancelSearchBtn">Cancelar Búsqueda</button>
     </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { 
-            getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, 
-            updateDoc, serverTimestamp, query, where, getDocs, addDoc
+            getFirestore, collection, doc, setDoc, onSnapshot, 
+            updateDoc, serverTimestamp, query, where, getDocs, addDoc, orderBy, deleteDoc 
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -236,147 +143,132 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const rtcConfig = { iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }] };
 
-        const rtcConfig = {
-            iceServers: [
-                { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }
-            ]
-        };
+        let localStream, peerConnection, currentRoomId, myUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+        let chatUnsubscribe = null;
 
-        let localStream = null, peerConnection = null, currentRoomId = null;
-        let myUserId = 'user_' + Math.random().toString(36).substr(2, 9);
-        let isSearching = false;
-
-        const localVideo = document.getElementById('localVideo');
-        const remoteVideo = document.getElementById('remoteVideo');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
         const searchingOverlay = document.getElementById('searchingOverlay');
 
-        // Inicialización de UI
-        document.getElementById('permissionModal').classList.add('active');
-
-        document.getElementById('requestPermissionBtn').onclick = async () => {
+        async function init() {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localVideo.srcObject = localStream;
-                document.getElementById('permissionModal').classList.remove('active');
+                document.getElementById('localVideo').srcObject = localStream;
                 startSearching();
-            } catch (e) { alert("Error al acceder a la cámara"); }
-        };
-
-        function updateStatus(state, text) {
-            statusText.textContent = text;
-            statusDot.className = 'status-dot ' + state;
+            } catch (e) { alert("Se requiere acceso a la cámara."); }
         }
 
         async function startSearching() {
-            if (isSearching) return;
-            isSearching = true;
             searchingOverlay.classList.add('active');
-            updateStatus('searching', 'Buscando...');
-
-            if (peerConnection) peerConnection.close();
-            if (currentRoomId) try { await deleteDoc(doc(db, 'videochat_rooms', currentRoomId)); } catch(e){}
-
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            if (chatUnsubscribe) chatUnsubscribe();
+            
             const q = query(collection(db, 'videochat_rooms'), where('status', '==', 'waiting'));
             const snapshot = await getDocs(q);
-            
+
             if (!snapshot.empty) {
-                const room = snapshot.docs[0];
-                if (room.data().creator !== myUserId) {
-                    await joinRoom(room.id, room.data());
-                    return;
-                }
+                await joinRoom(snapshot.docs[0].id, snapshot.docs[0].data());
+            } else {
+                await createRoom();
             }
-            await createRoom();
-        }
-
-        function setupPeerConnection() {
-            peerConnection = new RTCPeerConnection(rtcConfig);
-            
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-            peerConnection.ontrack = (event) => {
-                remoteVideo.srcObject = event.streams[0];
-                document.getElementById('remoteVideoBox').classList.add('active');
-            };
-
-            peerConnection.oniceconnectionstatechange = () => {
-                if (peerConnection.iceConnectionState === 'disconnected') updateStatus('disconnected', 'Desconectado');
-            };
         }
 
         async function createRoom() {
             currentRoomId = 'room_' + Date.now();
-            setupPeerConnection();
-
-            // Guardar candidatos ICE en subcolección
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    addDoc(collection(db, 'videochat_rooms', currentRoomId, 'creatorCandidates'), event.candidate.toJSON());
-                }
-            };
-
+            setupPeer();
+            
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
-
+            
             await setDoc(doc(db, 'videochat_rooms', currentRoomId), {
-                creator: myUserId,
                 offer: { type: offer.type, sdp: offer.sdp },
-                status: 'waiting'
+                status: 'waiting',
+                createdAt: serverTimestamp()
             });
 
-            onSnapshot(doc(db, 'videochat_rooms', currentRoomId), async (snap) => {
+            const unsub = onSnapshot(doc(db, 'videochat_rooms', currentRoomId), async (snap) => {
                 const data = snap.data();
-                if (data?.answer && !peerConnection.currentRemoteDescription) {
+                if (data?.answer) {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                     searchingOverlay.classList.remove('active');
-                    isSearching = false;
-                    updateStatus('connected', 'Conectado');
+                    listenChat(currentRoomId);
+                    unsub();
                 }
-            });
-
-            onSnapshot(collection(db, 'videochat_rooms', currentRoomId, 'joinerCandidates'), (snap) => {
-                snap.docChanges().forEach(async (change) => {
-                    if (change.type === 'added') await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
-                });
             });
         }
 
         async function joinRoom(roomId, roomData) {
             currentRoomId = roomId;
-            setupPeerConnection();
-
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    addDoc(collection(db, 'videochat_rooms', roomId, 'joinerCandidates'), event.candidate.toJSON());
-                }
-            };
-
+            setupPeer();
             await peerConnection.setRemoteDescription(new RTCSessionDescription(roomData.offer));
             const answer = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answer);
-
             await updateDoc(doc(db, 'videochat_rooms', roomId), {
                 answer: { type: answer.type, sdp: answer.sdp },
                 status: 'connected'
             });
-
-            onSnapshot(collection(db, 'videochat_rooms', roomId, 'creatorCandidates'), (snap) => {
-                snap.docChanges().forEach(async (change) => {
-                    if (change.type === 'added') await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
-                });
-            });
-
             searchingOverlay.classList.remove('active');
-            isSearching = false;
-            updateStatus('connected', 'Conectado');
+            listenChat(roomId);
         }
 
-        document.getElementById('nextBtn').onclick = () => { isSearching = false; startSearching(); };
-        document.getElementById('stopBtn').onclick = () => location.reload();
-        document.getElementById('cancelSearchBtn').onclick = () => { searchingOverlay.classList.remove('active'); isSearching = false; };
+        function setupPeer() {
+            peerConnection = new RTCPeerConnection(rtcConfig);
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            peerConnection.ontrack = (e) => {
+                document.getElementById('remoteVideo').srcObject = e.streams[0];
+            };
+            peerConnection.onicecandidate = (e) => {
+                if (e.candidate && currentRoomId) {
+                    addDoc(collection(db, 'videochat_rooms', currentRoomId, 'candidates'), e.candidate.toJSON());
+                }
+            };
+        }
+
+        function listenChat(roomId) {
+            chatMessages.innerHTML = '';
+            const q = query(collection(db, 'videochat_rooms', roomId, 'messages'), orderBy('timestamp', 'asc'));
+            chatUnsubscribe = onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const data = change.doc.data();
+                        const div = document.createElement('div');
+                        div.className = `message ${data.sender === myUserId ? 'msg-me' : 'msg-them'}`;
+                        div.textContent = data.text;
+                        chatMessages.appendChild(div);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                });
+            });
+        }
+
+        chatForm.onsubmit = async (e) => {
+            e.preventDefault();
+            if (!chatInput.value.trim() || !currentRoomId) return;
+            const text = chatInput.value;
+            chatInput.value = '';
+            await addDoc(collection(db, 'videochat_rooms', currentRoomId, 'messages'), {
+                text: text, sender: myUserId, timestamp: serverTimestamp()
+            });
+        };
+
+        // EVENTO CANCELAR
+        document.getElementById('cancelSearchBtn').onclick = () => {
+            searchingOverlay.classList.remove('active');
+            if (currentRoomId) {
+                deleteDoc(doc(db, 'videochat_rooms', currentRoomId));
+                currentRoomId = null;
+            }
+            if (peerConnection) peerConnection.close();
+        };
+
+        document.getElementById('nextBtn').onclick = startSearching;
+        init();
     </script>
 </body>
 </html>
