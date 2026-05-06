@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Trading Terminal PRO - Martin Chater</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0e; --surface: #14141b; --border: #262633;
+            --accent: #9b7fd4; --green: #00ff88; --red: #ff3333; --text: #e1e1e6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar */
+        .market-sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        .market-item { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; transition: 0.2s; }
+        .market-item:hover { background: rgba(155,127,212,0.05); }
+        .market-item.active { border-left: 4px solid var(--accent); background: rgba(155,127,212,0.1); color: var(--accent); font-weight: bold; }
+
+        /* Main Content */
+        .trading-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .top-info { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; background: var(--surface); }
+        
+        #chart-container { flex: 3; background: #000; }
+
+        .positions-panel { flex: 1; min-height: 150px; background: var(--surface); border-top: 1px solid var(--border); padding: 12px; overflow-y: auto; }
+        .pos-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: left; }
+        .pos-table th { color: #555; padding-bottom: 8px; text-transform: uppercase; font-weight: 400; }
+        .pos-table td { padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* Order Panel */
+        .order-panel { width: 260px; background: var(--surface); border-left: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .input-group { display: flex; flex-direction: column; gap: 4px; }
+        .input-group label { font-size: 0.65rem; color: #888; text-transform: uppercase; }
+        input, select { background: #000; border: 1px solid var(--border); padding: 8px; color: white; border-radius: 4px; font-size: 0.85rem; }
+        
+        .btn-trade { padding: 12px; border: none; border-radius: 4px; font-family: 'Bebas Neue'; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .btn-long { background: var(--green); color: #000; }
+        .btn-short { background: var(--red); color: #fff; }
+        .btn-trade:hover { opacity: 0.8; transform: translateY(-1px); }
+        
+        .stat-val { font-weight: bold; color: var(--green); }
+        .limit-tag { font-size: 0.65rem; padding: 1px 4px; border-radius: 3px; background: #262633; color: #aaa; margin-right: 3px; }
+        .close-btn { color: #555; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        .close-btn:hover { color: var(--red); }
+    </style>
+</head>
+<body>
+
+    <div class="market-sidebar">
+        <div style="padding: 15px; font-family: 'Bebas Neue'; color: var(--accent); font-size: 1.3rem; border-bottom: 1px solid var(--border);">MERCADOS</div>
+        <div class="market-item active" onclick="changeSymbol('BTCUSDT', 'BINANCE:BTCUSDT', this)">BTC / USDT</div>
+        <div class="market-item" onclick="changeSymbol('ETHUSDT', 'BINANCE:ETHUSDT', this)">ETH / USDT</div>
+        <div class="market-item" onclick="changeSymbol('SOLUSDT', 'BINANCE:SOLUSDT', this)">SOL / USDT</div>
+        <div class="market-item" onclick="changeSymbol('BNBUSDT', 'BINANCE:BNBUSDT', this)">BNB / USDT</div>
+        <div class="market-item" onclick="changeSymbol('XRPUSDT', 'BINANCE:XRPUSDT', this)">XRP / USDT</div>
+    </div>
+
+    <div class="trading-main">
+        <div class="top-info">
+            <div style="display:flex; align-items: baseline; gap: 10px">
+                <h3 id="symbolTitle" style="font-family: 'Bebas Neue'; letter-spacing: 1px;">BTCUSDT</h3>
+                <span id="livePrice" style="color:var(--accent); font-weight: bold; font-size: 0.9rem;">---</span>
+            </div>
+            <div style="display: flex; gap: 20px; font-size: 0.85rem;">
+                <div><span style="color:#666">SALDO:</span> <span id="balanceText" class="stat-val">$0.00</span></div>
+                <div><span style="color:#666">PNL TOTAL:</span> <span id="totalPnLText" class="stat-val">+$0.00</span></div>
+            </div>
+        </div>
+        
+        <div id="chart-container"></div>
+
+        <div class="positions-panel">
+            <table class="pos-table">
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th>Tipo</th>
+                        <th>Entrada</th>
+                        <th>TP / SL</th>
+                        <th>PnL Live</th>
+                        <th>Cerrar</th>
+                    </tr>
+                </thead>
+                <tbody id="positionsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="order-panel">
+        <h4 style="font-family:'Bebas Neue'; color: var(--accent)">EJECUTAR ORDEN</h4>
+        
+        <div class="input-group">
+            <label>Inversión ($)</label>
+            <input type="number" id="tradeAmount" value="1000">
+        </div>
+
+        <div class="input-group">
+            <label>Leverage</label>
+            <select id="leverage">
+                <option value="1">1x (Spot)</option>
+                <option value="10">10x</option>
+                <option value="50">50x</option>
+                <option value="100">100x</option>
+            </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="input-group">
+                <label style="color: var(--green)">Take Profit</label>
+                <input type="number" id="tpPrice" step="any" placeholder="Precio">
+            </div>
+            <div class="input-group">
+                <label style="color: var(--red)">Stop Loss</label>
+                <input type="number" id="slPrice" step="any" placeholder="Precio">
+            </div>
+        </div>
+
+        <button class="btn-trade btn-long" onclick="openPosition('LONG')">LONG</button>
+        <button class="btn-trade btn-short" onclick="openPosition('SHORT')">SHORT</button>
+        
+        <div style="margin-top:auto; padding-top: 10px; border-top: 1px solid var(--border); text-align: center;">
+            <a href="categoria5-2.html" style="color:#555; text-decoration:none; font-size: 0.7rem;">CONFIGURACIÓN</a>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        let currentSymbol = 'BTCUSDT';
+        let livePrices = {};
+        let positions = JSON.parse(localStorage.getItem('trading_positions')) || [];
+        let socket;
+
+        function initWebSocket() {
+            if (socket) socket.close();
+            socket = new WebSocket('wss://stream.binance.com:9443/ws/!miniTicker@arr');
+            socket.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                data.forEach(t => { livePrices[t.s] = parseFloat(t.c); });
+                
+                // Actualizar precio arriba con el símbolo correcto
+                if (livePrices[currentSymbol]) {
+                    document.getElementById('livePrice').innerText = `$${livePrices[currentSymbol].toLocaleString()}`;
+                }
+                
+                checkAutoClose();
+                updateUI();
+            };
+        }
+
+        function initChart(tvSymbol) {
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": tvSymbol,
+                "interval": "5",
+                "theme": "dark",
+                "style": "1",
+                "locale": "es",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "hide_side_toolbar": false,
+                "allow_symbol_change": true,
+                "container_id": "chart-container"
+            });
+        }
+
+        function changeSymbol(s, tv, el) {
+            currentSymbol = s; // ACTUALIZAR LA VARIABLE GLOBAL
+            document.getElementById('symbolTitle').innerText = s; // ACTUALIZAR EL TÍTULO
+            
+            // UI Sidebar
+            document.querySelectorAll('.market-item').forEach(m => m.classList.remove('active'));
+            el.classList.add('active');
+            
+            // Reiniciar Gráfico
+            initChart(tv);
+        }
+
+        function openPosition(type) {
+            const price = livePrices[currentSymbol];
+            if (!price) return alert("Cargando precios...");
+
+            let balance = parseFloat(localStorage.getItem('trading_balance') || "10000");
+            const amount = parseFloat(document.getElementById('tradeAmount').value);
+            
+            const tpVal = document.getElementById('tpPrice').value;
+            const slVal = document.getElementById('slPrice').value;
+            const tp = tpVal !== "" ? parseFloat(tpVal) : null;
+            const sl = slVal !== "" ? parseFloat(slVal) : null;
+
+            if (amount > balance) return alert("Saldo insuficiente");
+
+            balance -= amount;
+            localStorage.setItem('trading_balance', balance);
+
+            positions.push({
+                symbol: currentSymbol,
+                type: type,
+                amount: amount,
+                entryPrice: price,
+                leverage: parseInt(document.getElementById('leverage').value),
+                tp: tp,
+                sl: sl
+            });
+
+            save();
+            // Limpiar inputs
+            document.getElementById('tpPrice').value = "";
+            document.getElementById('slPrice').value = "";
+        }
+
+        function checkAutoClose() {
+            positions.forEach((pos, i) => {
+                const cur = livePrices[pos.symbol];
+                if (!cur) return;
+
+                let trigger = false;
+                if (pos.type === 'LONG') {
+                    if (pos.tp && cur >= pos.tp) trigger = true;
+                    if (pos.sl && cur <= pos.sl) trigger = true;
+                } else {
+                    if (pos.tp && cur <= pos.tp) trigger = true;
+                    if (pos.sl && cur >= pos.sl) trigger = true;
+                }
+
+                if (trigger) closePos(i, calculatePnL(pos, cur));
+            });
+        }
+
+        function calculatePnL(pos, cur) {
+            const diff = pos.type === 'LONG' ? (cur - pos.entryPrice) : (pos.entryPrice - cur);
+            return (diff / pos.entryPrice) * pos.amount * pos.leverage;
+        }
+
+        function updateUI() {
+            const balance = parseFloat(localStorage.getItem('trading_balance') || "10000");
+            document.getElementById('balanceText').innerText = `$${balance.toLocaleString()}`;
+            
+            const tbody = document.getElementById('positionsBody');
+            let totalPnL = 0;
+            tbody.innerHTML = '';
+
+            positions.forEach((pos, i) => {
+                const cur = livePrices[pos.symbol] || pos.entryPrice;
+                const pnl = calculatePnL(pos, cur);
+                totalPnL += pnl;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${pos.symbol}</b></td>
+                        <td style="color:${pos.type==='LONG'?'var(--green)':'var(--red)'}">${pos.type} ${pos.leverage}x</td>
+                        <td>$${pos.entryPrice.toFixed(2)}</td>
+                        <td><span class="limit-tag">TP:${pos.tp||'-'}</span><span class="limit-tag">SL:${pos.sl||'-'}</span></td>
+                        <td style="color:${pnl>=0?'var(--green)':'var(--red)'}">$${pnl.toFixed(2)}</td>
+                        <td><i class="fas fa-times-circle close-btn" onclick="manualClose(${i})"></i></td>
+                    </tr>`;
+            });
+
+            const pnlBox = document.getElementById('totalPnLText');
+            pnlBox.innerText = (totalPnL >= 0 ? '+' : '') + `$${totalPnL.toFixed(2)}`;
+            pnlBox.style.color = totalPnL >= 0 ? 'var(--green)' : 'var(--red)';
+        }
+
+        function manualClose(i) {
+            const pos = positions[i];
+            closePos(i, calculatePnL(pos, livePrices[pos.symbol] || pos.entryPrice));
+        }
+
+        function closePos(i, pnl) {
+            let b = parseFloat(localStorage.getItem('trading_balance'));
+            b += (positions[i].amount + pnl);
+            localStorage.setItem('trading_balance', b);
+            positions.splice(i, 1);
+            save();
+        }
+
+        function save() {
+            localStorage.setItem('trading_positions', JSON.stringify(positions));
+            updateUI();
+        }
+
+        window.onload = () => {
+            initChart('BINANCE:BTCUSDT');
+            initWebSocket();
+        };
+    </script>
+</body>
+</html>

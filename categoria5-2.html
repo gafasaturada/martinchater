@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuración Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body { background: #0a0a0e; color: white; font-family: 'DM Sans', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .card { background: #14141b; padding: 40px; border-radius: 12px; border: 1px solid #262633; width: 350px; }
+        h1 { font-family: 'Bebas Neue'; color: #9b7fd4; margin-bottom: 25px; }
+        label { display: block; font-size: 0.75rem; color: #666; margin-bottom: 8px; }
+        input { width: 100%; background: #000; border: 1px solid #262633; padding: 12px; color: white; border-radius: 4px; margin-bottom: 20px; }
+        button { width: 100%; padding: 15px; background: #9b7fd4; border: none; color: white; font-family: 'Bebas Neue'; font-size: 1.2rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>MANIPULAR TRADING</h1>
+        <label>NUEVO SALDO DE PRÁCTICA</label>
+        <input type="number" id="nb" placeholder="Ej: 10000">
+        
+        <label>COMISIÓN POR OPERACIÓN (%)</label>
+        <input type="number" id="nf" step="0.01" placeholder="Ej: 0.1">
+
+        <button onclick="save()">GUARDAR Y REINICIAR</button>
+        <a href="categoria5.html" style="display:block; text-align:center; margin-top:15px; color:#444; text-decoration:none; font-size:0.8rem">CANCELAR</a>
+    </div>
+
+    <script>
+        function save() {
+            localStorage.setItem('trading_balance', document.getElementById('nb').value);
+            localStorage.setItem('trading_config', JSON.stringify({ fee: parseFloat(document.getElementById('nf').value) }));
+            localStorage.setItem('trading_positions', JSON.stringify([])); // Limpia posiciones para evitar errores
+            alert("Sistema reiniciado con nuevos valores.");
+            window.location.href = 'categoria5.html';
+        }
+    </script>
+</body>
+</html>

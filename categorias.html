@@ -8,17 +8,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0a0a0a;
-            --surface: #111111;
-            --surface2: #1a1a1a;
-            --border: #222222;
-            --red: #cc2200;
-            --red-dim: rgba(204,34,0,0.15);
-            --red-glow: rgba(204,34,0,0.35);
-            --text: #e8e8e8;
-            --text-dim: #666666;
+            --bg: #080810;
+            --surface: #0e0e1a;
+            --surface2: #13131f;
+            --border: #2a1f4a;
+            --accent: #a855f7;
+            --accent-bright: #c084fc;
+            --accent-dim: rgba(168,85,247,0.12);
+            --accent-glow: rgba(168,85,247,0.35);
+            --text: #e8e0ff;
+            --text-dim: #6b5f8a;
+            --text-mid: #9d8bc4;
             --sidebar-w: 72px;
             --topbar-h: 64px;
+            --gold: #d4a843;
+            --gold-dim: rgba(212,168,67,0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,15 +35,15 @@
             overflow: hidden;
         }
 
-        /* Grain overlay */
+        /* Dark grain overlay */
         body::after {
             content: '';
             position: fixed;
             inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
             pointer-events: none;
             z-index: 100;
-            opacity: 0.4;
+            opacity: 0.6;
         }
 
         /* SIDEBAR */
@@ -64,24 +68,60 @@
             top: 0; right: -1px;
             width: 1px;
             height: 100%;
-            background: linear-gradient(180deg, transparent, var(--red), transparent);
+            background: linear-gradient(180deg, transparent, var(--accent), transparent);
             opacity: 0.6;
         }
 
         .sidebar-logo {
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
-            margin-bottom: 16px;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            margin-bottom: 12px;
             border: 1px solid var(--border);
             object-fit: cover;
+            box-shadow: 0 0 16px var(--accent-glow);
         }
 
         .sidebar-divider {
             width: 32px;
             height: 1px;
             background: var(--border);
-            margin: 8px 0;
+            margin: 4px 0;
+        }
+
+        .sidebar-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 52px;
+            padding: 8px 4px;
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.42rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .sidebar-nav-btn i {
+            font-size: 1.05rem;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-nav-btn:hover {
+            background: var(--accent-dim);
+            color: var(--accent-bright);
+            border-color: var(--border);
+            box-shadow: 0 0 12px var(--accent-dim);
         }
 
         /* TOPBAR */
@@ -106,7 +146,7 @@
             bottom: -1px; left: 0;
             width: 100%;
             height: 1px;
-            background: linear-gradient(90deg, var(--red), transparent 60%);
+            background: linear-gradient(90deg, var(--accent), transparent 60%);
             opacity: 0.5;
         }
 
@@ -121,7 +161,7 @@
             font-size: 1.4rem;
             letter-spacing: 3px;
             color: var(--text);
-            opacity: 0.5;
+            opacity: 0.35;
         }
 
         .topbar-sep {
@@ -138,7 +178,7 @@
         }
 
         .breadcrumb span {
-            color: var(--red);
+            color: var(--accent-bright);
         }
 
         .topbar-right {
@@ -157,7 +197,7 @@
             border-radius: 4px;
             font-size: 0.9rem;
             font-weight: 600;
-            color: #e8c84a;
+            color: var(--gold);
             position: relative;
             overflow: hidden;
         }
@@ -166,7 +206,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, rgba(232,200,74,0.05), transparent);
+            background: linear-gradient(90deg, var(--gold-dim), transparent);
         }
 
         .coins-display i { font-size: 0.8rem; }
@@ -190,15 +230,16 @@
         }
 
         .topbar-btn:hover {
-            background: var(--surface2);
+            background: var(--accent-dim);
             color: var(--text);
-            border-color: #333;
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-dim);
         }
 
         .topbar-btn.danger:hover {
-            background: var(--red-dim);
-            color: var(--red);
-            border-color: var(--red);
+            background: rgba(204,34,0,0.1);
+            color: #ff5533;
+            border-color: rgba(204,34,0,0.4);
         }
 
         /* MAIN CONTENT */
@@ -221,7 +262,7 @@
             font-size: 0.7rem;
             letter-spacing: 4px;
             text-transform: uppercase;
-            color: var(--red);
+            color: var(--accent-bright);
             margin-bottom: 8px;
             display: flex;
             align-items: center;
@@ -233,7 +274,7 @@
             flex: 1;
             max-width: 40px;
             height: 1px;
-            background: var(--red);
+            background: var(--accent);
             opacity: 0.5;
         }
 
@@ -242,27 +283,28 @@
             font-size: clamp(2.5rem, 4vw, 3.5rem);
             letter-spacing: 4px;
             color: var(--text);
-            line-height: 1;
+            text-shadow: 0 0 40px rgba(168,85,247,0.15);
         }
 
         /* GRID */
         .categories-grid {
+            flex: 1;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(2, 1fr);
             gap: 16px;
-            flex: 1;
-            max-height: calc(100vh - var(--topbar-h) - 160px);
+            overflow: hidden;
         }
 
-        /* CATEGORY CARD */
+        /* CARD */
         .category-card {
-            position: relative;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 4px;
+            cursor: pointer;
             text-decoration: none;
             color: var(--text);
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -316,13 +358,13 @@
             transition: color 0.3s ease;
         }
 
-        /* Red accent line at bottom */
+        /* Accent line at bottom */
         .card-line {
             position: absolute;
             bottom: 0; left: 0;
             width: 0;
             height: 2px;
-            background: var(--red);
+            background: var(--accent);
             transition: width 0.4s ease;
         }
 
@@ -338,17 +380,17 @@
 
         /* Hover state */
         .category-card:hover {
-            border-color: #2a2a2a;
-            background: #131313;
+            border-color: var(--accent);
+            background: var(--surface2);
             transform: translateY(-3px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(204,34,0,0.1);
+            box-shadow: 0 20px 50px rgba(168,85,247,0.2), 0 0 0 1px rgba(168,85,247,0.15), 0 0 30px rgba(168,85,247,0.08) inset;
         }
 
         .category-card:hover .card-line { width: 100%; }
-        .category-card:hover .card-number { color: var(--red-dim); }
-        .category-card:hover .card-icon { color: var(--red); }
-        .category-card:hover .card-name { color: #ffffff; }
-        .category-card:hover .card-corner { border-color: var(--red); opacity: 0.6; }
+        .category-card:hover .card-number { color: rgba(168,85,247,0.2); }
+        .category-card:hover .card-icon { color: var(--accent-bright); }
+        .category-card:hover .card-name { color: var(--text); }
+        .category-card:hover .card-corner { border-color: var(--accent); opacity: 0.7; }
 
         /* COMING SOON */
         .category-card.locked {
@@ -394,6 +436,18 @@
     <div class="sidebar">
         <img src="logo2.png" alt="Logo" class="sidebar-logo">
         <div class="sidebar-divider"></div>
+        <a href="categoria1.html" class="sidebar-nav-btn">
+            <i class="fas fa-comments"></i>
+            Chat
+        </a>
+        <a href="casino.html" class="sidebar-nav-btn">
+            <i class="fas fa-dice"></i>
+            Casino
+        </a>
+        <a href="categoria3.html" class="sidebar-nav-btn">
+            <i class="fas fa-video"></i>
+            Acho Camara
+        </a>
     </div>
 
     <div class="topbar">
@@ -472,13 +526,12 @@
                 <div class="card-line"></div>
             </a>
 
-            <a href="categoria6.html" class="category-card locked">
+            <a href="categoria5.html" class="category-card">
                 <div class="card-corner"></div>
                 <div class="card-number">06</div>
-                <div class="locked-badge">Próximamente</div>
-                <div class="card-icon"><i class="fas fa-ellipsis-h"></i></div>
-                <div class="card-name">MÁS</div>
-                <div class="card-desc">Contenido extra</div>
+                <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="card-name">TRADING</div>
+                <div class="card-desc">Mercado de valores</div>
                 <div class="card-line"></div>
             </a>
 

@@ -59,7 +59,6 @@
         .spinner { width: 60px; height: 60px; border: 5px solid var(--gray-800); border-top-color: var(--gold-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* BOTÓN CANCELAR */
         .btn-cancel-search {
             margin-top: 30px;
             background: transparent;
@@ -147,6 +146,7 @@
 
         let localStream, peerConnection, currentRoomId, myUserId = 'user_' + Math.random().toString(36).substr(2, 9);
         let chatUnsubscribe = null;
+        let iceUnsubscribe = null;
 
         const chatMessages = document.getElementById('chatMessages');
         const chatForm = document.getElementById('chatForm');
@@ -168,6 +168,7 @@
                 peerConnection = null;
             }
             if (chatUnsubscribe) chatUnsubscribe();
+            if (iceUnsubscribe) iceUnsubscribe();
             
             const q = query(collection(db, 'videochat_rooms'), where('status', '==', 'waiting'));
             const snapshot = await getDocs(q);
@@ -194,7 +195,7 @@
 
             const unsub = onSnapshot(doc(db, 'videochat_rooms', currentRoomId), async (snap) => {
                 const data = snap.data();
-                if (data?.answer) {
+                if (data?.answer && !peerConnection.currentRemoteDescription) {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                     searchingOverlay.classList.remove('active');
                     listenChat(currentRoomId);
@@ -220,14 +221,35 @@
         function setupPeer() {
             peerConnection = new RTCPeerConnection(rtcConfig);
             localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            
             peerConnection.ontrack = (e) => {
-                document.getElementById('remoteVideo').srcObject = e.streams[0];
-            };
-            peerConnection.onicecandidate = (e) => {
-                if (e.candidate && currentRoomId) {
-                    addDoc(collection(db, 'videochat_rooms', currentRoomId, 'candidates'), e.candidate.toJSON());
+                const remoteVid = document.getElementById('remoteVideo');
+                if (remoteVid.srcObject !== e.streams[0]) {
+                    remoteVid.srcObject = e.streams[0];
                 }
             };
+
+            peerConnection.onicecandidate = (e) => {
+                if (e.candidate && currentRoomId) {
+                    const candidateRef = collection(db, 'videochat_rooms', currentRoomId, 'candidates');
+                    addDoc(candidateRef, {
+                        ...e.candidate.toJSON(),
+                        userId: myUserId // Identificamos quién envió el candidato
+                    });
+                }
+            };
+
+            // Escuchar candidatos remotos
+            iceUnsubscribe = onSnapshot(collection(db, 'videochat_rooms', currentRoomId, 'candidates'), (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const data = change.doc.data();
+                        if (data.userId !== myUserId) { // Solo añadir si no es nuestro
+                            peerConnection.addIceCandidate(new RTCIceCandidate(data)).catch(e => console.error(e));
+                        }
+                    }
+                });
+            });
         }
 
         function listenChat(roomId) {
@@ -257,7 +279,6 @@
             });
         };
 
-        // EVENTO CANCELAR
         document.getElementById('cancelSearchBtn').onclick = () => {
             searchingOverlay.classList.remove('active');
             if (currentRoomId) {
