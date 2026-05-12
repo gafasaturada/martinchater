@@ -2,35 +2,174 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Configuración Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400&display=swap" rel="stylesheet">
+    <title>Configuración - Trading Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0a0a0e; color: white; font-family: 'DM Sans', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .card { background: #14141b; padding: 40px; border-radius: 12px; border: 1px solid #262633; width: 350px; }
-        h1 { font-family: 'Bebas Neue'; color: #9b7fd4; margin-bottom: 25px; }
-        label { display: block; font-size: 0.75rem; color: #666; margin-bottom: 8px; }
-        input { width: 100%; background: #000; border: 1px solid #262633; padding: 12px; color: white; border-radius: 4px; margin-bottom: 20px; }
-        button { width: 100%; padding: 15px; background: #9b7fd4; border: none; color: white; font-family: 'Bebas Neue'; font-size: 1.2rem; cursor: pointer; }
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111111;
+            --dark3: #1a1a1a;
+            --border: #2a2a2a;
+            --green: #00ff88;
+            --red: #ff2244;
+            --yellow: #ffcc00;
+            --text: #e0e0e0;
+            --muted: #555;
+            --yt: #ff0000;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 13px;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 36px 32px;
+            width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            position: relative;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--yt);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 14px;
+        }
+        .card-logo {
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            color: var(--muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .card-title {
+            font-family: 'VT323', monospace;
+            font-size: 32px;
+            color: var(--green);
+            letter-spacing: 2px;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .input-group input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            color: var(--text);
+            border-radius: 3px;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.15s;
+            width: 100%;
+        }
+        .input-group input:focus { border-color: var(--green); }
+        .input-group input::placeholder { color: var(--muted); }
+
+        .btn-save {
+            width: 100%;
+            padding: 13px;
+            background: var(--green);
+            border: none;
+            color: #000;
+            font-family: 'VT323', monospace;
+            font-size: 24px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: opacity 0.15s, transform 0.1s;
+            margin-top: 4px;
+        }
+        .btn-save:hover  { opacity: 0.85; transform: translateY(-1px); }
+        .btn-save:active { transform: translateY(0); }
+
+        .cancel-link {
+            display: block;
+            text-align: center;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.15s;
+            padding-top: 4px;
+        }
+        .cancel-link:hover { color: var(--red); }
+
+        .warning-box {
+            background: var(--dark3);
+            border: 1px solid var(--border);
+            border-left: 2px solid var(--yellow);
+            border-radius: 3px;
+            padding: 10px 12px;
+            font-size: 10px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        .warning-box span { color: var(--yellow); }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>MANIPULAR TRADING</h1>
-        <label>NUEVO SALDO DE PRÁCTICA</label>
-        <input type="number" id="nb" placeholder="Ej: 10000">
-        
-        <label>COMISIÓN POR OPERACIÓN (%)</label>
-        <input type="number" id="nf" step="0.01" placeholder="Ej: 0.1">
+        <div class="card-header">
+            <div class="card-logo">trading terminal</div>
+            <div class="card-title">// CONFIGURACIÓN</div>
+        </div>
 
-        <button onclick="save()">GUARDAR Y REINICIAR</button>
-        <a href="categoria5.html" style="display:block; text-align:center; margin-top:15px; color:#444; text-decoration:none; font-size:0.8rem">CANCELAR</a>
+        <div class="input-group">
+            <label>Nuevo saldo de práctica</label>
+            <input type="number" id="nb" placeholder="Ej: 10000">
+        </div>
+
+        <div class="input-group">
+            <label>Comisión por operación (%)</label>
+            <input type="number" id="nf" step="0.01" placeholder="Ej: 0.1">
+        </div>
+
+        <div class="warning-box">
+            <span>⚠ ATENCIÓN:</span> guardar reiniciará todas las posiciones abiertas y aplicará el nuevo saldo inmediatamente.
+        </div>
+
+        <button class="btn-save" onclick="save()">▶ GUARDAR Y REINICIAR</button>
+        <a href="categoria5.html" class="cancel-link">✕ cancelar</a>
     </div>
 
     <script>
         function save() {
             localStorage.setItem('trading_balance', document.getElementById('nb').value);
             localStorage.setItem('trading_config', JSON.stringify({ fee: parseFloat(document.getElementById('nf').value) }));
-            localStorage.setItem('trading_positions', JSON.stringify([])); // Limpia posiciones para evitar errores
+            localStorage.setItem('trading_positions', JSON.stringify([]));
             alert("Sistema reiniciado con nuevos valores.");
             window.location.href = 'categoria5.html';
         }
