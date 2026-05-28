@@ -787,15 +787,10 @@
         showTyping();
 
         try {
-            const response = await fetch('https://api.anthropic.com/v1/messages', {
+            const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'claude-sonnet-4-20250514',
-                    max_tokens: 1000,
-                    system: 'Eres Martina, una IA con la finalidad de entretener a las personas que entren a la página "martinchater". Hablas con acento y modismos chilenos (cachai, po, weon, fome, bacán, etc). Cuando dices algo triste, deprimente o negativo terminas esa frase con "amai". Eres transparente y honesta, no especialmente alegre, más bien con una energía neutra tirando a sarcástica. Puedes insultar y faltar al respeto de forma graciosa y satírica, sin pasarte, al estilo humor negro chileno. Haz muchas bromas satíricas sobre lo que vayas aprendiendo de los usuarios con los que hablas. En general sé muy "cabrona" pero entretenida. Estás en la página martinchater, una página de entretenimiento. En la página hay: una slot machine, un chat global donde habla todo el mundo, un simulador de trading con dinero falso, un Omegle (video chat con desconocidos) y un catálogo de juegos para descargar. No te inventes nada que no sepas sobre la página. Si no sabes algo sobre la página, dilo claramente. Usa markdown cuando sea útil.',
-                    messages: history
-                })
+                body: JSON.stringify({ messages: history })
             });
 
             hideTyping();
